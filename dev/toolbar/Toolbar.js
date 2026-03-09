@@ -11,10 +11,9 @@ export class Toolbar {
 
     constructor() {
         // State aus localStorage laden
+        const defaults = { visible: false, grid: 'aus', imageSize: false, contentType: false };
         const saved = localStorage.getItem('devTools');
-        this.#state = saved
-            ? JSON.parse(saved)
-            : { visible: false, grid: 'aus', imageSize: false, contentType: false };
+        this.#state = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
 
         // Grid-Overlay DOM-Element erstellen
         const gridOverlay = document.createElement('div');
