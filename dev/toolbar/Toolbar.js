@@ -67,7 +67,7 @@ export class Toolbar {
 
     #applyState() {
         document.body.setAttribute('data-dev-grid', this.#state.grid);
-        document.body.setAttribute('data-dev-content-type', this.#state.contentType);
+        document.body.setAttribute('data-dev-content-types', this.#state.contentType);
         this.#updateImageSize();
         this.#updateContentTypeLabels();
     }

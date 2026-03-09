@@ -13,7 +13,7 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
     $margin-left: size($layout, $margin-left);
     $margin-right: size($layout, $margin-right);
 
-    body[data-dev='true'] {
+    body:not([data-dev-grid='aus']) {
         .dev-toolbar__grid::after {
             // the grid is made through repition
             // 'important' because background settings are more specific than the grid settings
@@ -25,7 +25,7 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
         }
     }
 
-    body[data-dev='true'][data-dev-grid="lines"] {
+    body[data-dev-grid="lines"] {
         .dev-toolbar__grid::after {
             background:
                 // center of the column spacing
@@ -38,7 +38,7 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
         }
     }
 
-    body[data-dev='true'][data-dev-grid="ribbons"] {
+    body[data-dev-grid="ribbons"] {
         .dev-toolbar__grid::after {
             background:
                 // ceft column ribbon
@@ -111,7 +111,7 @@ picture {
     pointer-events: none;
     z-index: 9999999;
 
-    body[data-dev-content-type="true"] & {
+    body[data-dev-content-types="true"] & {
         display: block;
     }
 }
