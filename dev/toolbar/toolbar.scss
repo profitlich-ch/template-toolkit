@@ -13,16 +13,14 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
     $margin-left: size($layout, $margin-left);
     $margin-right: size($layout, $margin-right);
 
-    body:not([data-dev-grid='aus']) {
-        .dev-toolbar__grid::after {
-            // the grid is made through repition
-            // 'important' because background settings are more specific than the grid settings
-            background-size: calc((100% - ($columns * $gutter)) * calc(1 / $columns) + $gutter) 1px !important;
-            margin: 0 ($margin-right - calc($gutter / 2)) 0 ($margin-left - calc($gutter / 2));
-            // The grid is calculated starting from the middle
-            // Thats why its necessary to add the half of the column gap to the left and right side
-            width: calc(100% - $margin-right + calc($gutter / 2) - $margin-left + calc($gutter / 2));
-        }
+    .dev-toolbar__grid::after {
+        // the grid is made through repition
+        // 'important' because background settings are more specific than the grid settings
+        background-size: calc((100% - ($columns * $gutter)) * calc(1 / $columns) + $gutter) 1px !important;
+        margin: 0 ($margin-right - calc($gutter / 2)) 0 ($margin-left - calc($gutter / 2));
+        // The grid is calculated starting from the middle
+        // Thats why its necessary to add the half of the column gap to the left and right side
+        width: calc(100% - $margin-right + calc($gutter / 2) - $margin-left + calc($gutter / 2));
     }
 
     body[data-dev-grid="lines"] {
@@ -62,7 +60,7 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
 
-    body[data-dev='true'] & {
+    body:not([data-dev-grid='aus']) & {
         display: block;
     }
 
