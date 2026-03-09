@@ -89,7 +89,7 @@ picture {
     position: relative;
 
     &::before{
-        content: attr(data-size);
+        content: attr(data-dev-size);
         font-family: sans-serif;
         position: absolute;
         top: 10px;
@@ -99,4 +99,30 @@ picture {
         text-shadow: 0 0 10px black;
         z-index: 10;
     }
+}
+
+.dev-toolbar__content-types {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9999999;
+
+    body[data-dev-content-type="true"] & {
+        display: block;
+    }
+}
+
+.dev-toolbar__content-type-label {
+    font: 600 12px / 1.25 sans-serif;
+    background-color: black;
+    color: white;
+    transform: rotate(-90deg) translate(-100%, -100%);
+    transform-origin: left top;
+    padding: 2px 10px;
+    position: absolute;
+    white-space: nowrap;
 }
