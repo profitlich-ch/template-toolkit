@@ -1,6 +1,6 @@
 {
     "name": "@profitlich/template-toolkit",
-    "version": "2.9.04",
+    "version": "2.10.0",
     "description": "Shared SCSS layout system, JS utilities, components and build scripts for profitlich template repos",
     "type": "module",
     "exports": {

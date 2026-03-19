@@ -135,12 +135,25 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
                 );
 
                 const queue = [...filesToUpload];
-                await Promise.all(workers.map(async (workerClient) => {
+                await Promise.all(workers.map(async (initialWorkerClient) => {
+                    let workerClient = initialWorkerClient;
                     try {
                         while (true) {
                             const item = queue.shift();
                             if (!item) break;
-                            await workerClient.uploadFrom(item.file, item.remotePath);
+                            let retries = 0;
+                            while (true) {
+                                try {
+                                    await workerClient.uploadFrom(item.file, item.remotePath);
+                                    break;
+                                } catch (err) {
+                                    retries++;
+                                    workerClient.close();
+                                    if (retries >= 3) throw err;
+                                    await delay(1000 * retries);
+                                    workerClient = await createClient(accessOptions);
+                                }
+                            }
                             progressBar.increment();
                         }
                     } finally {
