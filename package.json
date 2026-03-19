@@ -1,6 +1,6 @@
 {
     "name": "@profitlich/template-toolkit",
-    "version": "2.10.0",
+    "version": "2.12.0",
     "description": "Shared SCSS layout system, JS utilities, components and build scripts for profitlich template repos",
     "type": "module",
     "exports": {
@@ -16,6 +16,7 @@
         "./utils/MailAdresses": "./utils/MailAdresses.js",
         "./utils/MediaQueries": "./utils/MediaQueries.js",
         "./utils/Vh100": "./utils/Vh100.js",
+        "./utils/ImagesLoaded": "./utils/images-loaded/ImagesLoaded.js",
         "./scripts/copy-files": "./scripts/copy-files.js",
         "./scripts/deploy": "./scripts/deploy.js",
         "./vite/jsonToScss": "./vite/jsonToScss.js"

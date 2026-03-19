@@ -1,0 +1,8 @@
+img {
+    opacity: 0;
+
+    &[data-loaded="true"] {
+        opacity: 1;
+        transition: opacity 0.3s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+}

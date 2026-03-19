@@ -4,8 +4,14 @@ import './mux-player.scss';
 export class MuxPlayer {
     #lazyLoadObserver;
     #playPauseObserver;
+    #loop;
+    #resolution;
+    #onPlayerCreated;
 
-    constructor() {
+    constructor({ loop = false, resolution = '1080p', onPlayerCreated = null } = {}) {
+        this.#loop = loop;
+        this.#resolution = resolution;
+        this.#onPlayerCreated = onPlayerCreated;
         this.#lazyLoadObserver = new IntersectionObserver(this.#handleLazyLoad.bind(this));
         this.#playPauseObserver = new IntersectionObserver(this.#handlePlayPause.bind(this));
     }
@@ -14,6 +20,40 @@ export class MuxPlayer {
         document.querySelectorAll('.mux-player').forEach(el => {
             this.#lazyLoadObserver.observe(el);
         });
+    }
+
+    #setupAutoplay(player) {
+        // Guard Clause: Führe das Setup nur aus, wenn es noch nicht passiert ist.
+        if (player.dataset.isSetup === 'true') {
+            return;
+        }
+
+        player.muted = true;
+        player.style.setProperty('--controls', 'none');
+        if (this.#loop) player.loop = true;
+
+        // Flag setzen, um zukünftige Ausführungen zu verhindern.
+        player.dataset.isSetup = 'true';
+
+        // Den playPauseObserver starten, sobald die Daten geladen sind.
+        if (player.readyState >= 2) { // HAVE_CURRENT_DATA oder höher
+            this.#playPauseObserver.observe(player);
+        } else {
+            player.addEventListener('loadeddata', () => {
+                this.#playPauseObserver.observe(player);
+            }, { once: true });
+        }
+    }
+
+    handleVisibilityChange(player) {
+        const isVisible = window.getComputedStyle(player).display !== 'none';
+
+        if (isVisible && player.hasAttribute('data-autoplay') && player.dataset.isSetup !== 'true') {
+            this.#setupAutoplay(player);
+        } else if (!isVisible) {
+            this.#playPauseObserver.unobserve(player);
+            player.pause();
+        }
     }
 
     #handleLazyLoad(entries) {
@@ -30,66 +70,25 @@ export class MuxPlayer {
                 player.streamType = 'on-demand';
                 player.playsInline = true;
                 player.style.aspectRatio = aspectRatio;
+                player.thumbnailTime = 0;
+                player.minResolution = this.#resolution;
 
-                // Autoplay-Attribut am Player-Element setzen, damit es später gefunden werden kann
+                if (container.dataset.accentColor) {
+                    player.accentColor = container.dataset.accentColor;
+                }
+
                 if (autoplay) {
                     player.setAttribute('data-autoplay', 'true');
                 }
 
-                const wrapper = container.closest('[data-video-wrapper]');
+                container.replaceWith(player);
 
-                // Wenn ein Wrapper gefunden wird, richte den MutationObserver ein
-                if (wrapper) {
-                    const visibilityObserver = new MutationObserver(() => {
-                        this.#handleVisibilityChange(player);
-                    });
-
-                    // Beobachte den gefundenen Wrapper
-                    visibilityObserver.observe(wrapper, { attributes: true, childList: true, subtree: true });
-
-                    // Container durch Player ersetzen BEVOR die Sichtbarkeitsprüfung
-                    container.replaceWith(player);
-
-                    // Führe eine initiale Prüfung durch, falls es schon sichtbar ist
-                    this.#handleVisibilityChange(player);
+                if (this.#onPlayerCreated) {
+                    this.#onPlayerCreated(player, container);
                 } else if (autoplay) {
-                    // Fallback für normale Autoplay-Videos ohne speziellen Wrapper
-                    player.muted = true;
-                    player.style.setProperty('--controls', 'none');
-                    container.replaceWith(player);
-
-                    player.addEventListener('loadeddata', () => {
-                        this.#playPauseObserver.observe(player);
-                    });
-                } else {
-                    // Für Videos ohne Autoplay
-                    container.replaceWith(player);
+                    this.handleVisibilityChange(player);
                 }
             }
-        }
-    }
-
-    #handleVisibilityChange(player) {
-        // Prüfe direkt am Player, ob er durch CSS sichtbar ist
-        const isVisible = window.getComputedStyle(player).display !== 'none';
-
-        if (isVisible && player.hasAttribute('data-autoplay')) {
-            // Wenn der Player sichtbar ist und Autoplay haben soll
-            player.muted = true;
-            player.style.setProperty('--controls', 'none');
-
-            // Warte auf loadeddata bevor der IntersectionObserver aktiviert wird
-            if (player.readyState >= 2) { // HAVE_CURRENT_DATA oder höher
-                this.#playPauseObserver.observe(player);
-            } else {
-                player.addEventListener('loadeddata', () => {
-                    this.#playPauseObserver.observe(player);
-                }, { once: true });
-            }
-        } else if (!isVisible) {
-            // Wenn der Player unsichtbar wird, pausiere ihn und stoppe die Beobachtung
-            this.#playPauseObserver.unobserve(player);
-            player.pause();
         }
     }
 
