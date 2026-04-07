@@ -2,6 +2,7 @@ img {
     // Bilder ohne per JS zugewiesenem Attribut false sind sichtbar
     &[data-loaded="false"] {
         opacity: 0;
+        transition: opacity 0.3s cubic-bezier(0.76, 0, 0.24, 1);
     }
 
     &[data-loaded="true"] {

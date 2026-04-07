@@ -81,6 +81,18 @@ export class MuxPlayer {
                     player.setAttribute('data-autoplay', 'true');
                 }
 
+                player.setAttribute('data-playing', 'false');
+
+                player.addEventListener('playing', () => {
+                    player.setAttribute('data-playing', 'true');
+                });
+                player.addEventListener('pause', () => {
+                    player.setAttribute('data-playing', 'pause');
+                });
+                player.addEventListener('ended', () => {
+                    player.setAttribute('data-playing', 'ended');
+                });
+
                 container.replaceWith(player);
 
                 if (this.#onPlayerCreated) {
