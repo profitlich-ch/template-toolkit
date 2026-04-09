@@ -77,6 +77,12 @@ export class MuxPlayer {
                     player.accentColor = container.dataset.accentColor;
                 }
 
+                if (container.dataset.poster === 'false') {
+                    player.setAttribute('poster', '');
+                } else if (container.dataset.poster) {
+                    player.poster = container.dataset.poster;
+                }
+
                 if (autoplay) {
                     player.setAttribute('data-autoplay', 'true');
                 }
