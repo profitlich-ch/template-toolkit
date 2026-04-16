@@ -74,8 +74,11 @@ export class MuxPlayer {
                 if (this.#noLowRes) {
                     const cssWidth = container.getBoundingClientRect().width;
                     const physicalWidth = cssWidth * window.devicePixelRatio;
-                    const [arW, arH] = aspectRatio.split('/').map(s => parseFloat(s.trim()));
-                    const physicalHeight = physicalWidth * (arH / arW);
+                    // aspectRatio funktioniert mit Zahl und mit Verhältnis (x/y)
+                    const arRatio = aspectRatio.includes('/')
+                        ? (([w, h]) => parseFloat(w) / parseFloat(h))(aspectRatio.split('/'))
+                        : parseFloat(aspectRatio);
+                    const physicalHeight = physicalWidth / arRatio;
                     const tiers = [
                         [270, '270p'], [360, '360p'], [480, '480p'], [540, '540p'],
                         [720, '720p'], [1080, '1080p'], [1440, '1440p'], [2160, '2160p'],
@@ -105,7 +108,7 @@ export class MuxPlayer {
 
                 console.log(
                     'Toolkit Video',
-                    'width:',container.getBoundingClientRect().width, 
+                    'width:', container.getBoundingClientRect().width, 
                     'height:', container.getBoundingClientRect().height,
                     'aspectRatio:', aspectRatio
                 );
