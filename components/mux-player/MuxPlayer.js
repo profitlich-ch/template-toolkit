@@ -5,12 +5,12 @@ export class MuxPlayer {
     #lazyLoadObserver;
     #playPauseObserver;
     #loop;
-    #resolution;
+    #noLowRes;
     #onPlayerCreated;
 
-    constructor({ loop = false, resolution = '1080p', onPlayerCreated = null } = {}) {
+    constructor({ loop = false, noLowRes = false, onPlayerCreated = null } = {}) {
         this.#loop = loop;
-        this.#resolution = resolution;
+        this.#noLowRes = noLowRes;
         this.#onPlayerCreated = onPlayerCreated;
         this.#lazyLoadObserver = new IntersectionObserver(this.#handleLazyLoad.bind(this));
         this.#playPauseObserver = new IntersectionObserver(this.#handlePlayPause.bind(this));
@@ -71,7 +71,17 @@ export class MuxPlayer {
                 player.playsInline = true;
                 player.style.aspectRatio = aspectRatio;
                 player.thumbnailTime = 0;
-                player.minResolution = this.#resolution;
+                if (this.#noLowRes) {
+                    const cssWidth = container.getBoundingClientRect().width;
+                    const physicalWidth = cssWidth * window.devicePixelRatio;
+                    const [arW, arH] = aspectRatio.split('/').map(s => parseFloat(s.trim()));
+                    const physicalHeight = physicalWidth * (arH / arW);
+                    const tiers = [
+                        [270, '270p'], [360, '360p'], [480, '480p'], [540, '540p'],
+                        [720, '720p'], [1080, '1080p'], [1440, '1440p'], [2160, '2160p'],
+                    ];
+                    player.minResolution = (tiers.find(([px]) => physicalHeight <= px) ?? [, '2160p'])[1];
+                }
 
                 if (container.dataset.accentColor) {
                     player.accentColor = container.dataset.accentColor;
@@ -87,11 +97,18 @@ export class MuxPlayer {
                     player.setAttribute('data-autoplay', 'true');
                 }
 
-                const setPlaying = value => player.parentElement.setAttribute('data-playing', value);
+                const setPlaying = value => player.setAttribute('data-playing', value);
 
                 player.addEventListener('playing', () => setPlaying('true'));
                 player.addEventListener('pause', () => setPlaying('pause'));
                 player.addEventListener('ended', () => setPlaying('ended'));
+
+                console.log(
+                    'Toolkit Video',
+                    'width:',container.getBoundingClientRect().width, 
+                    'height:', container.getBoundingClientRect().height,
+                    'aspectRatio:', aspectRatio
+                );
 
                 container.replaceWith(player);
                 setPlaying('false');
