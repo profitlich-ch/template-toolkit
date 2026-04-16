@@ -72,7 +72,8 @@ export class MuxPlayer {
                 player.style.aspectRatio = aspectRatio;
                 player.thumbnailTime = 0;
                 if (this.#noLowRes) {
-                    const cssWidth = container.getBoundingClientRect().width;
+                    const cssWidth = container.getBoundingClientRect().width
+                        || container.parentElement?.getBoundingClientRect().width;
                     const physicalWidth = cssWidth * window.devicePixelRatio;
                     // aspectRatio funktioniert mit Zahl und mit Verhältnis (x/y)
                     const arRatio = aspectRatio.includes('/')
