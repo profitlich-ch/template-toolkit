@@ -28,6 +28,7 @@ export class MuxPlayer {
             return;
         }
 
+        const autoplay = player.dataset.autoplay === 'true';
         if (autoplay) player.muted = true;
         if (autoplay) player.style.setProperty('--controls', 'none');
         if (this.#loop) player.loop = true;
