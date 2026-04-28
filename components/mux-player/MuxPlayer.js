@@ -22,14 +22,14 @@ export class MuxPlayer {
         });
     }
 
-    #setupAutoplay(player) {
+    #setup(player) {
         // Guard Clause: Führe das Setup nur aus, wenn es noch nicht passiert ist.
         if (player.dataset.isSetup === 'true') {
             return;
         }
 
-        player.muted = true;
-        player.style.setProperty('--controls', 'none');
+        if (autoplay) player.muted = true;
+        if (autoplay) player.style.setProperty('--controls', 'none');
         if (this.#loop) player.loop = true;
 
         // Flag setzen, um zukünftige Ausführungen zu verhindern.
@@ -48,8 +48,8 @@ export class MuxPlayer {
     handleVisibilityChange(player) {
         const isVisible = window.getComputedStyle(player).display !== 'none';
 
-        if (isVisible && player.hasAttribute('data-autoplay') && player.dataset.isSetup !== 'true') {
-            this.#setupAutoplay(player);
+        if (isVisible && player.dataset.isSetup !== 'true') {
+            this.#setup(player);
         } else if (!isVisible) {
             this.#playPauseObserver.unobserve(player);
             player.pause();
