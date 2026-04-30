@@ -1,9 +1,11 @@
 body {
 
-    &[data-menu-active="true"] {
+    &[data-menu-fixed="true"] {
         position: fixed;
         width: 100%;
+    }
 
+    &[data-menu-active="true"] {
         // Bedeckt das Menü nur einen Teil der Seite, ist also ein Teil der Seite weiterhin zu sehen,
         // soll die Maus Interaktionen ausserhalb des Menüs ignorieren
         .main {

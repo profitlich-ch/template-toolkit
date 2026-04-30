@@ -8,18 +8,22 @@ export class MenuToggle {
     #menuItemClass;
     #scrollbarWidth;
     #shiftElement;
+    #shiftDelay;
+    #deferPositionFixed;
     #y;
     #bodyClickHandler;
     #resizeHandler;
     #escapeHandler;
     isActive;
 
-    constructor(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId) {
+    constructor(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId, shiftDelay = 0, deferPositionFixed = false) {
         this.#menuButton = document.getElementById(menuButtonId);
         this.#menu = document.getElementById(menuId);
         this.#menuLinkClass = menuLinkClass;
         this.#menuItemClass = menuItemClass;
         this.#shiftElement = shiftElementId ? document.getElementById(shiftElementId) : null;
+        this.#shiftDelay = shiftDelay * 1000;
+        this.#deferPositionFixed = deferPositionFixed;
         this.#scrollbarWidth = 0;
         this.isActive = false;
         this.#y = 0;
@@ -39,14 +43,18 @@ export class MenuToggle {
                 this.#toggleMenu();
             }
         });
+
+        this.#setBodyAttribute('data-menu-active', 'false');
+        this.#setBodyAttribute('data-menu-moving', 'false');
+        this.#setBodyAttribute('data-menu-fixed', 'false');
     }
 
-    static getInstance(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId) {
+    static getInstance(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId, shiftDelay, deferPositionFixed) {
         if (!MenuToggle.#instance) {
             if (!menuButtonId || !menuId || !menuLinkClass || !menuItemClass) {
                 throw new Error("MenuToggle muss beim ersten Aufruf mit menuButtonId, menuId, menuLinkClass und menuItemClass initialisiert werden.");
             }
-            MenuToggle.#instance = new MenuToggle(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId);
+            MenuToggle.#instance = new MenuToggle(menuButtonId, menuId, menuLinkClass, menuItemClass, shiftElementId, shiftDelay, deferPositionFixed);
         }
         return MenuToggle.#instance;
     }
@@ -57,6 +65,7 @@ export class MenuToggle {
             document.body.removeEventListener('click', this.#bodyClickHandler);
             window.removeEventListener('resize', this.#resizeHandler);
             this.#setBodyAttribute('data-menu-active', 'false');
+            this.#setBodyAttribute('data-menu-fixed', 'false');
             if (this.#shiftElement) {
                 this.#shiftElement.style.marginRight = '';
                 this.#shiftElement.style.width = '';
@@ -69,16 +78,26 @@ export class MenuToggle {
             this.isActive = true;
             document.body.addEventListener('click', this.#bodyClickHandler);
             window.addEventListener('resize', this.#resizeHandler);
-            this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            this.#y = window.scrollY;
             this.#setBodyAttribute('data-menu-active', 'true');
-            document.body.style.paddingRight = `${this.#scrollbarWidth}px`;
-            document.body.style.top = `-${this.#y}px`;
-            if (this.#shiftElement) {
-                const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
-                this.#shiftElement.style.marginRight = `${marginOriginal + this.#scrollbarWidth}px`;
-                this.#adjustShiftElementWidth();
+            this.#setBodyAttribute('data-menu-moving', 'true');
+            if (!this.#deferPositionFixed) {
+                this.#setBodyAttribute('data-menu-fixed', 'true');
             }
+            setTimeout(() => {
+                this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                this.#y = window.scrollY;
+                document.body.style.paddingRight = `${this.#scrollbarWidth}px`;
+                document.body.style.top = `-${this.#y}px`;
+                if (this.#deferPositionFixed) {
+                    this.#setBodyAttribute('data-menu-fixed', 'true');
+                }
+                if (this.#shiftElement) {
+                    const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
+                    this.#shiftElement.style.marginRight = `${marginOriginal + this.#scrollbarWidth}px`;
+                    this.#adjustShiftElementWidth();
+                }
+                this.#setBodyAttribute('data-menu-moving', 'false');
+            }, this.#shiftDelay);
             this.#toggleEscape(true);
         }
         const event = new CustomEvent('eventMenuestatus', {
