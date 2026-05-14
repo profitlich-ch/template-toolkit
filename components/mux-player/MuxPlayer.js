@@ -91,7 +91,6 @@ export class MuxPlayer {
                 const player = document.createElement('mux-player');
                 player.playbackId = playbackId;
                 player.streamType = 'on-demand';
-                player.playsInline = true;
                 player.style.aspectRatio = aspectRatio;
                 player.thumbnailTime = 0;
                 if (this.#noLowRes) {
