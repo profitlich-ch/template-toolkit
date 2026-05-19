@@ -9,14 +9,21 @@ import cliProgress from 'cli-progress';
 // Helper for making sure the upload progress bars go to 100%
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function isNewer(client, localFile, remotePath) {
+function formatBytes(bytes) {
+    if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+    if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+    if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${bytes} B`;
+}
+
+async function getFileStatus(client, localFile, remotePath) {
     const localStat = await fs.stat(localFile);
     try {
         const remoteDate = await client.lastMod(remotePath);
-        return localStat.mtimeMs > remoteDate.getTime();
+        return { shouldUpload: localStat.mtimeMs > remoteDate.getTime(), size: localStat.size };
     } catch {
         // File doesn't exist remotely (550) or server doesn't support MDTM — upload it
-        return true;
+        return { shouldUpload: true, size: localStat.size };
     }
 }
 
@@ -71,8 +78,9 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
                 for (const file of files) {
                     const relativeFile = path.relative(task.localBase, file);
                     const remotePath = path.join(task.remoteDir, relativeFile).replace(/\\/g, '/');
-                    if (await isNewer(mainClient, file, remotePath)) {
-                        filesToUpload.push({ file, remotePath });
+                    const { shouldUpload, size } = await getFileStatus(mainClient, file, remotePath);
+                    if (shouldUpload) {
+                        filesToUpload.push({ file, remotePath, size });
                     }
                 }
             } else {
@@ -88,8 +96,9 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
                             if (!file) break;
                             const relativeFile = path.relative(task.localBase, file);
                             const remotePath = path.join(task.remoteDir, relativeFile).replace(/\\/g, '/');
-                            if (await isNewer(workerClient, file, remotePath)) {
-                                filesToUpload.push({ file, remotePath });
+                            const { shouldUpload, size } = await getFileStatus(workerClient, file, remotePath);
+                            if (shouldUpload) {
+                                filesToUpload.push({ file, remotePath, size });
                             }
                         }
                     } finally {
@@ -105,21 +114,28 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
                 continue;
             }
 
+            const totalBytes = filesToUpload.reduce((sum, { size }) => sum + size, 0);
+            let uploadedBytes = 0;
+
             const progressBar = new cliProgress.SingleBar({
-                format: '  Upload |{bar}| {percentage}%   {value}/{total} files   {duration_formatted}',
+                format: '  Upload |{bar}| {percentage}%   {value}/{total} files   {uploaded}/{totalSize}   {duration_formatted}',
                 barCompleteChar: '█',
                 barIncompleteChar: '░',
                 hideCursor: true
             });
 
             activeProgressBar = progressBar;
-            progressBar.start(filesToUpload.length, 0);
+            progressBar.start(filesToUpload.length, 0, {
+                uploaded: formatBytes(0),
+                totalSize: formatBytes(totalBytes)
+            });
 
             if (parallel <= 1) {
-                for (const { file, remotePath } of filesToUpload) {
+                for (const { file, remotePath, size } of filesToUpload) {
                     await mainClient.ensureDir(path.dirname(remotePath));
                     await mainClient.uploadFrom(file, remotePath);
-                    progressBar.increment();
+                    uploadedBytes += size;
+                    progressBar.increment(1, { uploaded: formatBytes(uploadedBytes) });
                 }
             } else {
                 // Pre-create all required remote directories with the main client
@@ -154,7 +170,8 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
                                     workerClient = await createClient(accessOptions);
                                 }
                             }
-                            progressBar.increment();
+                            uploadedBytes += item.size;
+                            progressBar.increment(1, { uploaded: formatBytes(uploadedBytes) });
                         }
                     } finally {
                         workerClient.close();
