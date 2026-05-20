@@ -4,6 +4,18 @@
 @use "sass:meta";
 @use "sass:math";
 
+// Liest das optionale Top-Level Feld `vwBasis` aus der Konsumenten-config.
+// Default 'viewport' = bisheriges Verhalten (raw vw).
+// 'body' = calc(var(--vw-body, 1vw) * X) — skaliert mit scrollbar-freier Body-Breite.
+@function _vw-basis() {
+    $vars: meta.module-variables('config');
+    $value: map.get($vars, 'vwBasis');
+    @if $value {
+        @return $value;
+    }
+    @return 'viewport';
+}
+
 // Media queries get the breakpoints
 // Breakpints get the layouts
 // Depending on the project, only a part of the layout names are used,
@@ -187,7 +199,12 @@ $mediaqueries: (
     @if ($unit-type == 'px') {
         @return $number * 1px;
     } @else if ($unit-type == 'vw') {
-        @return _decimal-round(math.div($number, $width) * 100, 2) * 1vw;
+        $factor: math.div($number, $width) * 100;
+        @if (_vw-basis() == 'body') {
+            @return calc(var(--vw-body, 1vw) * #{$factor});
+        } @else {
+            @return _decimal-round($factor, 2) * 1vw;
+        }
     } @else {
         @error "Nicht unterstützter Einheitstyp '#{$unit-type}' für Layout '#{$layout}'. Nur 'px' oder 'vw' werden unterstützt.";
     }
