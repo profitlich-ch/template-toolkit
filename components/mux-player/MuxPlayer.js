@@ -69,13 +69,12 @@ export class MuxPlayer {
         player.dataset.isSetup = 'true';
 
         if (autoplay) {
-            if (player.readyState >= 2) { // HAVE_CURRENT_DATA oder höher
-                this.#playPauseObserver.observe(player);
-            } else {
-                player.addEventListener('loadeddata', () => {
-                    this.#playPauseObserver.observe(player);
-                }, { once: true });
-            }
+            // Kein Warten auf loadeddata: Das Event feuert auf Mobile bei aktivem
+            // Data-Saver gar nicht (MDN) und auf iOS Safari mit nativem HLS oft erst
+            // nach dem ersten play()-Aufruf. IntersectionObserver feuert beim observe()
+            // direkt mit dem aktuellen Status — play() darf vor loadeddata aufgerufen
+            // werden, der Browser kümmert sich ums Buffering.
+            this.#playPauseObserver.observe(player);
         }
     }
 
