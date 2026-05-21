@@ -81,13 +81,13 @@ $mediaqueries: (
 
 
 // Font
-@mixin font($layout, $fontSize, $lineHeight, $bold:'false') {
+@mixin font($layout, $fontSize, $lineHeight, $weight:'false') {
 
     font-size: size($layout, $fontSize);
     line-height: size($layout, $lineHeight);
 
-    @if ($bold != 'false') {
-        font-weight: $bold;
+    @if ($weight != 'false') {
+        font-weight: $weight;
     }
 
 }
