@@ -1,6 +1,6 @@
 {
     "name": "@profitlich/template-toolkit",
-    "version": "3.1.1",
+    "version": "4.0.0",
     "description": "Shared SCSS layout system, JS utilities, components and build scripts for profitlich template repos",
     "type": "module",
     "exports": {
@@ -20,7 +20,8 @@
         "./utils/ImagesLoaded": "./utils/images-loaded/ImagesLoaded.js",
         "./scripts/copy-files": "./scripts/copy-files.js",
         "./scripts/deploy": "./scripts/deploy.js",
-        "./vite/jsonToScss": "./vite/jsonToScss.js"
+        "./vite/jsonToScss": "./vite/jsonToScss.js",
+        "./vite/capsizeSassFunctions": "./vite/capsizeSassFunctions.js"
     },
     "files": [
         "components/",
@@ -40,9 +41,17 @@
         "lil-gui": "^0.21.0"
     },
     "peerDependencies": {
+        "@capsizecss/core": ">=4.0.0",
+        "@capsizecss/unpack": ">=2.0.0",
         "@mux/mux-player": ">=3.0.0"
     },
     "peerDependenciesMeta": {
+        "@capsizecss/core": {
+            "optional": true
+        },
+        "@capsizecss/unpack": {
+            "optional": true
+        },
         "@mux/mux-player": {
             "optional": true
         }

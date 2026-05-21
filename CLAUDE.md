@@ -46,6 +46,27 @@ Per Default skalieren vw-basierte Werte mit der Viewport-Breite inkl. Scrollbar 
 
 **Wichtig bei vwBasis "body"**: Werte aus `size()`, `columns()`, `marginPadding()` sind dann CSS-`calc()`-Ausdrücke. Sass kann sie ausserhalb eines `calc()`-Wrappers nicht arithmetisch kombinieren. Statt `($a - $b)` mit Sass-Parens → `calc($a - $b)`. Auch im Default-Modus ist diese Schreibweise unschädlich, also generell als Konvention nutzen.
 
+### Capsize
+
+Optionale pixel-präzise Schriftpositionierung via `@capsizecss/core` (Em-Trims an `::before`/`::after`). Capsize wird zur Sass-Compile-Zeit über eine Custom-Function direkt aufgerufen — keine Algorithmus-Reimplementierung, Updates aus dem Capsize-Paket fliessen mit.
+
+Setup im Konsumenten:
+
+1. `@capsizecss/unpack` und `@capsizecss/core` als devDependency installieren.
+2. In `src/config.json` Top-Level-Feld `fonts` ergänzen: Map Name → Pfad zur Font-Datei.
+3. In `vite.config.js`:
+
+    ```js
+    import { createCapsizeFunctions } from '@profitlich/template-toolkit/vite/capsizeSassFunctions';
+    // defineConfig async:
+    const capsizeFunctions = await createCapsizeFunctions(configJson.fonts ?? {});
+    // dann: css.preprocessorOptions.scss.functions = capsizeFunctions;
+    ```
+
+4. Pro `@include font(...)` als 4. Argument den Font-Namen aus `fonts` mitgeben — Trims werden emittiert. Ohne Argument: kein Capsize-Output (Default).
+
+`font-weight` wird nicht mehr vom `font()`-Mixin gesetzt — direkt im CSS deklarieren (meist breakpoint-übergreifend).
+
 ## Vite Entry
 
 Einen neuen Entry in `rollupOptions.input` eintragen **nur wenn** das Script per Twig/PHP-Tag direkt eingebunden wird. Wird es von einem anderen Script importiert, braucht es keinen eigenen Entry.
