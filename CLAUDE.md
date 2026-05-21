@@ -67,6 +67,19 @@ Setup im Konsumenten:
 
 `font-weight` wird nicht mehr vom `font()`-Mixin gesetzt — direkt im CSS deklarieren (meist breakpoint-übergreifend).
 
+**SCSS-Organisation**: `scss/core/capsize.scss` enthält das `capsize`-Mixin (emittiert Pseudo-Elemente). `font()` in `layout.scss` ruft es intern auf, wenn das 4. Argument gesetzt ist. Du kannst das Mixin auch direkt nutzen, falls du Capsize ohne `font()` brauchst:
+
+```scss
+.foo { @include capsize("soehne", 40, 45); }
+```
+
+**Cap-Höhe als SCSS-Wert**: `capsize-cap-height($name, $fontSize)` liefert die Cap-Höhe als unitless Zahl (Design-Pixel). Nutzbar für eigene Berechnungen, z. B. paddings, die zum Grid passen sollen:
+
+```scss
+$cap: capsize-cap-height("soehne", 40);  // → font-spezifischer Wert
+padding-top: size($layout, 40 - $cap + 8);
+```
+
 ## Vite Entry
 
 Einen neuen Entry in `rollupOptions.input` eintragen **nur wenn** das Script per Twig/PHP-Tag direkt eingebunden wird. Wird es von einem anderen Script importiert, braucht es keinen eigenen Entry.

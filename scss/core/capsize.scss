@@ -1,0 +1,15 @@
+// Emittiert die Capsize-Pseudo-Elemente (::before/::after mit Em-Trims)
+// für den aktuellen Selektor. Die Inhalte (welche Pseudo-Elemente, welche
+// Properties) kommen vollständig aus @capsizecss/core via der
+// Sass-Custom-Function capsize-pseudo-elements (registriert im
+// vite/capsizeSassFunctions.js des Toolkits).
+@mixin capsize($name, $fontSize, $lineHeight) {
+    $pseudo: capsize-pseudo-elements($name, $fontSize, $lineHeight);
+    @each $selector-suffix, $props in $pseudo {
+        &#{$selector-suffix} {
+            @each $prop, $val in $props {
+                #{$prop}: $val;
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 {
     "name": "@profitlich/template-toolkit",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "description": "Shared SCSS layout system, JS utilities, components and build scripts for profitlich template repos",
     "type": "module",
     "exports": {
@@ -9,6 +9,7 @@
         "./dev": "./dev/Dev.js",
         "./dev/toolbar": "./dev/toolbar/Toolbar.js",
         "./scss/forward": "./scss/forward.scss",
+        "./scss/core/capsize": "./scss/core/capsize.scss",
         "./scss/core/hamburger": "./scss/core/hamburger.scss",
         "./scss/core/layout": "./scss/core/layout.scss",
         "./scss/core/mediaqueries": "./scss/core/mediaqueries.scss",

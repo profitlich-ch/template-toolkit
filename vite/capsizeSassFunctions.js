@@ -1,5 +1,5 @@
 import { fromFile } from '@capsizecss/unpack';
-import { createStyleObject } from '@capsizecss/core';
+import { createStyleObject, getCapHeight } from '@capsizecss/core';
 import * as sass from 'sass';
 import { OrderedMap } from 'immutable';
 import path from 'path';
@@ -58,6 +58,22 @@ export async function createCapsizeFunctions(fontFiles) {
                 }
             }
             return new sass.SassMap(OrderedMap(entries));
+        },
+
+        'capsize-cap-height($name, $fontSize)': (args) => {
+            const name = args[0].assertString('name').text;
+            const fontSize = args[1].assertNumber('fontSize').value;
+
+            const fontMetrics = metrics[name];
+            if (!fontMetrics) {
+                throw new Error(
+                    `capsize-cap-height: Keine Metriken für Font "${name}" geladen. ` +
+                    `Verfügbar: ${Object.keys(metrics).join(', ') || '(keine)'}.`
+                );
+            }
+
+            const capHeight = getCapHeight({ fontSize, fontMetrics });
+            return new sass.SassNumber(capHeight);
         }
     };
 }

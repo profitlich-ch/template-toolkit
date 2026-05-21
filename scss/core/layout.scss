@@ -1,11 +1,9 @@
 @use "config";
+@use "capsize" as *;
 @use "sass:list";
 @use "sass:map";
 @use "sass:meta";
 @use "sass:math";
-
-// capsize-trims wird ggf. von Vite via preprocessorOptions.scss.functions bereitgestellt
-// (siehe createCapsizeFunctions in vite/capsizeSassFunctions.js).
 
 // Liest das optionale Top-Level Feld `vwBasis` aus der Konsumenten-config.
 // Default 'viewport' = bisheriges Verhalten (raw vw).
@@ -90,18 +88,7 @@ $mediaqueries: (
     line-height: size($layout, $lineHeight);
 
     @if ($capsize != null) {
-        // capsize-pseudo-elements() ist eine Sass-Custom-Function aus dem Toolkit-Vite-Plugin.
-        // Ruft intern @capsizecss/core.createStyleObject auf und gibt eine Sass-Map
-        // mit allen Pseudo-Element-Stilen zurück. Inhalte (welche Pseudo-Elemente,
-        // welche Properties) kommen vollständig aus Capsize.
-        $pseudo: capsize-pseudo-elements($capsize, $fontSize, $lineHeight);
-        @each $selector-suffix, $props in $pseudo {
-            &#{$selector-suffix} {
-                @each $prop, $val in $props {
-                    #{$prop}: $val;
-                }
-            }
-        }
+        @include capsize($capsize, $fontSize, $lineHeight);
     }
 
 }
