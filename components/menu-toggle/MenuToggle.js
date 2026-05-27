@@ -121,15 +121,11 @@ export class MenuToggle {
                 window.addEventListener('resize', this.#resizeHandler);
                 this.#setBodyAttribute('data-menu-moving', 'true');
                 if (!this.#deferPositionFixed) {
-                    this.#fixElement.setAttribute('data-menu-fixed', 'true');
+                    this.#applyFix();
                 }
                 setTimeout(() => {
-                    this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                    this.#y = window.scrollY;
-                    this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
-                    this.#fixElement.style.top = `-${this.#y}px`;
                     if (this.#deferPositionFixed) {
-                        this.#fixElement.setAttribute('data-menu-fixed', 'true');
+                        this.#applyFix();
                     }
                     if (this.#shiftElement) {
                         const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
@@ -145,6 +141,14 @@ export class MenuToggle {
             detail: { menueStatus: this.isActive }
         });
         document.dispatchEvent(event);
+    }
+
+    #applyFix() {
+        this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        this.#y = window.scrollY;
+        this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
+        this.#fixElement.style.top = `-${this.#y}px`;
+        this.#fixElement.setAttribute('data-menu-fixed', 'true');
     }
 
     #adjustShiftElementWidth() {
