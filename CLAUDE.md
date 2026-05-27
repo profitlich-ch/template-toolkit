@@ -25,7 +25,6 @@ Code bleibt im **Projekt**, wenn er projektspezifische Pfade, CSS-Klassen oder C
 - **Klassen bevorzugen** mit private Fields per `#`-Prefix – nie Underscore-Konvention (`_field`)
 - **Singleton-Pattern** für Utilities, die global einmalig sind (analog zu `MediaQueries`, `MenuToggle`)
 - **Design Patterns:** Vor der Implementierung das passende Pattern vorschlagen und begründen – nicht immer ist Singleton richtig
-- **Kommentare** dokumentieren Funktion und Zweck – keine Änderungshistorie im Code
 
 ## Custom Events und Data-Attributes
 

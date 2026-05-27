@@ -25,6 +25,7 @@ export class MenuToggle {
     #deferPositionFixed;
     #lockScroll;
     #fixElement;
+    #fixElementIsBody;
     #y;
     #bodyClickHandler;
     #resizeHandler;
@@ -54,6 +55,7 @@ export class MenuToggle {
         this.#deferPositionFixed = deferPositionFixed;
         this.#lockScroll = lockScroll;
         this.#fixElement = fixElementSelector ? document.querySelector(fixElementSelector) : document.body;
+        this.#fixElementIsBody = this.#fixElement === document.body;
         this.#scrollbarWidth = 0;
         this.isActive = false;
         this.#y = 0;
@@ -108,7 +110,9 @@ export class MenuToggle {
                     this.#shiftElement.style.marginRight = '';
                     this.#shiftElement.style.width = '';
                 }
-                this.#fixElement.style.paddingRight = '';
+                if (this.#fixElementIsBody) {
+                    this.#fixElement.style.paddingRight = '';
+                }
                 this.#fixElement.style.top = '';
                 window.scrollTo(0, this.#y);
             }
@@ -143,10 +147,14 @@ export class MenuToggle {
         document.dispatchEvent(event);
     }
 
+    // Scrollbar-Ausgleich nur nötig, wenn der Body fixiert wird –
+    // bei anderem #fixElement bleibt die Seiten-Scrollbar bestehen.
     #applyFix() {
         this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
         this.#y = window.scrollY;
-        this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
+        if (this.#fixElementIsBody) {
+            this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
+        }
         this.#fixElement.style.top = `-${this.#y}px`;
         this.#fixElement.setAttribute('data-menu-fixed', 'true');
     }
