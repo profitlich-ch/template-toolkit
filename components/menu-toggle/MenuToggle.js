@@ -5,12 +5,13 @@ export class MenuToggle {
     #menuButton;
     #menu;
     #menuLinkSelector;
-    #menuItemClass;
+    #menuItemSelector;
     #scrollbarWidth;
     #shiftElement;
     #shiftDelay;
     #deferPositionFixed;
-    #fixBody;
+    #lockScroll;
+    #fixElement;
     #y;
     #bodyClickHandler;
     #resizeHandler;
@@ -19,33 +20,36 @@ export class MenuToggle {
 
     /**
      * @param {Object}  options
-     * @param {string}  options.menuButtonId        ID des Buttons, der das Menü öffnet/schliesst.
-     * @param {string}  options.menuId              ID des Menü-Containers.
-     * @param {string}  options.menuLinkSelector    Selektor für Menü-Links, die das Menü beim Klick schliessen (z.B. '.menu-link').
-     * @param {string}  options.menuItemClass       Klassenname (ohne Punkt) des Menü-Wrappers; Klicks ausserhalb schliessen das Menü.
-     * @param {string?} options.shiftElementId      Optional: Element, das beim Öffnen um die Scrollbar-Breite verschoben/verbreitert wird, damit z.B. ein fixierter Header nicht springt.
-     * @param {number}  options.shiftDelay          Verzögerung in Sekunden, bevor Scrollbar gemessen und Body fixiert wird – nützlich, wenn vorher noch eine CSS-Animation läuft, die die Scrollbar entfernt.
-     * @param {boolean} options.deferPositionFixed  Setzt `data-menu-fixed` erst nach `shiftDelay` statt sofort. Nötig, wenn das Fixieren eine laufende Öffnungs-Animation stören würde.
-     * @param {boolean} options.fixBody             Wenn `false`, bleibt der Body scrollbar; kein Scrollbar-Ausgleich und kein Shift. Für Menüs, die nur einen Teil der Seite bedecken und Hintergrund-Scroll erlauben sollen.
+     * @param {string}  options.menuButtonSelector    CSS-Selektor (`querySelector`) des Buttons, der das Menü öffnet/schliesst.
+     * @param {string}  options.menuSelector          CSS-Selektor (`querySelector`) des Menü-Containers.
+     * @param {string}  options.menuLinkSelector      CSS-Selektor für Menü-Links, die das Menü beim Klick schliessen (z.B. '.menu-link').
+     * @param {string}  options.menuItemSelector      CSS-Selektor des Menü-Wrappers; Klicks ausserhalb schliessen das Menü (z.B. '.menu').
+     * @param {string?} options.shiftElementSelector  Optional: CSS-Selektor des Elements, das beim Öffnen um die Scrollbar-Breite verschoben/verbreitert wird, damit z.B. ein fixierter Header nicht springt.
+     * @param {number}  options.shiftDelay            Verzögerung in Sekunden, bevor Scrollbar gemessen und Body fixiert wird – nützlich, wenn vorher noch eine CSS-Animation läuft, die die Scrollbar entfernt.
+     * @param {boolean} options.deferPositionFixed    Setzt `data-menu-fixed` erst nach `shiftDelay` statt sofort. Nötig, wenn das Fixieren eine laufende Öffnungs-Animation stören würde.
+     * @param {boolean} options.lockScroll            Wenn `false`, bleibt das fixierende Element scrollbar; kein Scrollbar-Ausgleich und kein Shift. Für Menüs, die nur einen Teil der Seite bedecken und Hintergrund-Scroll erlauben sollen.
+     * @param {string?} options.fixElementSelector    Optional: CSS-Selektor des Elements, das beim Öffnen fixiert wird (`position: fixed`, Scrollbar-Ausgleich, Scroll-Position-Trick). Default: `document.body`.
      */
     constructor({
-        menuButtonId,
-        menuId,
+        menuButtonSelector,
+        menuSelector,
         menuLinkSelector,
-        menuItemClass,
-        shiftElementId = null,
+        menuItemSelector,
+        shiftElementSelector = null,
         shiftDelay = 0,
         deferPositionFixed = false,
-        fixBody = true,
+        lockScroll = true,
+        fixElementSelector = null,
     }) {
-        this.#menuButton = document.getElementById(menuButtonId);
-        this.#menu = document.getElementById(menuId);
+        this.#menuButton = document.querySelector(menuButtonSelector);
+        this.#menu = document.querySelector(menuSelector);
         this.#menuLinkSelector = menuLinkSelector;
-        this.#menuItemClass = menuItemClass;
-        this.#shiftElement = shiftElementId ? document.getElementById(shiftElementId) : null;
+        this.#menuItemSelector = menuItemSelector;
+        this.#shiftElement = shiftElementSelector ? document.querySelector(shiftElementSelector) : null;
         this.#shiftDelay = shiftDelay * 1000;
         this.#deferPositionFixed = deferPositionFixed;
-        this.#fixBody = fixBody;
+        this.#lockScroll = lockScroll;
+        this.#fixElement = fixElementSelector ? document.querySelector(fixElementSelector) : document.body;
         this.#scrollbarWidth = 0;
         this.isActive = false;
         this.#y = 0;
@@ -68,13 +72,13 @@ export class MenuToggle {
 
         this.#setBodyAttribute('data-menu-active', 'false');
         this.#setBodyAttribute('data-menu-moving', 'false');
-        this.#setBodyAttribute('data-menu-fixed', 'false');
+        this.#fixElement.setAttribute('data-menu-fixed', 'false');
     }
 
     static getInstance(options) {
         if (!MenuToggle.#instance) {
-            if (!options || !options.menuButtonId || !options.menuId || !options.menuLinkSelector || !options.menuItemClass) {
-                throw new Error("MenuToggle muss beim ersten Aufruf mit menuButtonId, menuId, menuLinkSelector und menuItemClass initialisiert werden.");
+            if (!options || !options.menuButtonSelector || !options.menuSelector || !options.menuLinkSelector || !options.menuItemSelector) {
+                throw new Error("MenuToggle muss beim ersten Aufruf mit menuButtonSelector, menuSelector, menuLinkSelector und menuItemSelector initialisiert werden.");
             }
             MenuToggle.#instance = new MenuToggle(options);
         }
@@ -87,14 +91,14 @@ export class MenuToggle {
             document.body.removeEventListener('click', this.#bodyClickHandler);
             window.removeEventListener('resize', this.#resizeHandler);
             this.#setBodyAttribute('data-menu-active', 'false');
-            if (this.#fixBody) {
-                this.#setBodyAttribute('data-menu-fixed', 'false');
+            if (this.#lockScroll) {
+                this.#fixElement.setAttribute('data-menu-fixed', 'false');
                 if (this.#shiftElement) {
                     this.#shiftElement.style.marginRight = '';
                     this.#shiftElement.style.width = '';
                 }
-                document.body.style.paddingRight = '';
-                document.body.style.top = '';
+                this.#fixElement.style.paddingRight = '';
+                this.#fixElement.style.top = '';
                 window.scrollTo(0, this.#y);
             }
             this.#toggleEscape(false);
@@ -102,19 +106,19 @@ export class MenuToggle {
             this.isActive = true;
             document.body.addEventListener('click', this.#bodyClickHandler);
             this.#setBodyAttribute('data-menu-active', 'true');
-            if (this.#fixBody) {
+            if (this.#lockScroll) {
                 window.addEventListener('resize', this.#resizeHandler);
                 this.#setBodyAttribute('data-menu-moving', 'true');
                 if (!this.#deferPositionFixed) {
-                    this.#setBodyAttribute('data-menu-fixed', 'true');
+                    this.#fixElement.setAttribute('data-menu-fixed', 'true');
                 }
                 setTimeout(() => {
                     this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
                     this.#y = window.scrollY;
-                    document.body.style.paddingRight = `${this.#scrollbarWidth}px`;
-                    document.body.style.top = `-${this.#y}px`;
+                    this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
+                    this.#fixElement.style.top = `-${this.#y}px`;
                     if (this.#deferPositionFixed) {
-                        this.#setBodyAttribute('data-menu-fixed', 'true');
+                        this.#fixElement.setAttribute('data-menu-fixed', 'true');
                     }
                     if (this.#shiftElement) {
                         const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
@@ -138,7 +142,7 @@ export class MenuToggle {
     }
 
     #onBodyClick(event) {
-        if (this.isActive && !event.target.closest('.' + this.#menuItemClass)) {
+        if (this.isActive && !event.target.closest(this.#menuItemSelector)) {
             this.#toggleMenu();
         }
     }
