@@ -6,6 +6,20 @@ import fs from 'fs/promises';
 import readline from 'readline';
 import cliProgress from 'cli-progress';
 
+/**
+ * @typedef {Object} UploadTask
+ * @property {string}   name           - Anzeigename des Tasks (für Logs).
+ * @property {string}   localPattern   - Glob-Pattern der hochzuladenden Dateien.
+ * @property {string}   localBase      - Basis-Pfad; relative Pfade werden auf den `remoteDir` gemappt.
+ * @property {string}   remoteDir      - Ziel-Verzeichnis auf dem FTP-Server.
+ * @property {string|string[]} [ignore] - Glob-Pattern, die vom Upload ausgeschlossen werden.
+ */
+
+/**
+ * @typedef {Object} DeployOptions
+ * @property {number} [parallel=3] - Anzahl paralleler FTP-Verbindungen. `1` deaktiviert Parallelität.
+ */
+
 // Helper for making sure the upload progress bars go to 100%
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -35,6 +49,13 @@ async function createClient(accessOptions) {
     return client;
 }
 
+/**
+ * Lädt die in `uploadTasks` definierten Dateien per FTP hoch.
+ * Liest `FTP_HOST_<MODE>`, `FTP_USER_<MODE>`, `FTP_PASSWORD_<MODE>` aus dem env.
+ * @param {'staging'|'production'} mode
+ * @param {UploadTask[]} uploadTasks
+ * @param {DeployOptions} [options]
+ */
 export async function runDeploy(mode, uploadTasks, options = {}) {
     const parallel = options.parallel ?? 3;
     const modeUpper = mode.toUpperCase();
@@ -198,8 +219,10 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
 
 /**
  * Run the deploy script.
- * @param {Array} uploadTasks - array of { name, localPattern, localBase, remoteDir, ignore? }
- * @param {Object} options - { parallel: number } (default: { parallel: 3 })
+ * Liest `process.argv[2]` (`'staging'` oder `'production'`) als Mode.
+ * Im Production-Mode wird vorher um Bestätigung gefragt.
+ * @param {UploadTask[]} uploadTasks
+ * @param {DeployOptions} [options]
  */
 export function run(uploadTasks, options = {}) {
     const mode = process.argv[2];

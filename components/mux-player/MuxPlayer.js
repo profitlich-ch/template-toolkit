@@ -2,6 +2,16 @@ import '@mux/mux-player';
 import './mux-player.scss';
 
 /**
+ * @typedef {Object} MuxPlayerOptions
+ * @property {boolean} [loop=false]            Wiederholt das Video nach Ende.
+ * @property {boolean} [noLowRes=false]        Setzt `minResolution` anhand der physischen Container-Grösse, damit auf hochauflösenden Displays keine zu kleine Auflösung gespielt wird.
+ * @property {((player: HTMLElement, container: HTMLElement) => void)} [onPlayerCreated] Callback, der nach jedem Lazy-Load-Setup aufgerufen wird (unabhängig von Autoplay).
+ * @property {boolean} [disableTracking=false] Setzt das `disable-tracking`-Attribut am Player — verhindert das Mux-Data-Tracking.
+ * @property {string}  [envKey]                Mux-Data-Env-Key. Nur wirksam, wenn `disableTracking=false`.
+ * @property {Object}  [metadata]              Mux-Data-Metadata-Objekt. Nur wirksam, wenn `envKey` gesetzt ist.
+ */
+
+/**
  * Lädt Mux-Videos lazy und steuert Autoplay per IntersectionObserver.
  *
  * Ladereihenfolge:
@@ -30,6 +40,9 @@ export class MuxPlayer {
     #envKey;
     #metadata;
 
+    /**
+     * @param {MuxPlayerOptions} [options]
+     */
     constructor({
         loop = false,
         noLowRes = false,

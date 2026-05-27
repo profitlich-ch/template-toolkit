@@ -1,6 +1,11 @@
-/**Media queries
- * https://kinsta.com/blog/javamediaqueryipt-media-query/
- * option 3 on the linked page
+/**
+ * Verwaltet Layout-Wechsel anhand von Breakpoints. Setzt `data-layout` am Body
+ * und feuert das Custom-Event `eventLayoutchange` bei jedem Wechsel.
+ * Siehe https://kinsta.com/blog/javamediaqueryipt-media-query/ (Option 3).
+ *
+ * @typedef {Object<string, number|null>} BreakpointsConfig
+ *   Map: Layout-Name → minimale Viewport-Breite in Pixeln (oder `null` für das kleinste Layout).
+ *   Reihenfolge der Keys bestimmt die Layout-Priorität (späteres Match überschreibt früheres).
  */
 
 export class MediaQueries {
@@ -8,6 +13,9 @@ export class MediaQueries {
     layout = 'desktop';
     #breakpoints;
 
+    /**
+     * @param {BreakpointsConfig} breakpoints
+     */
     constructor(breakpoints) {
         this.#breakpoints = breakpoints;
         this.layout = 'desktop';
@@ -15,6 +23,11 @@ export class MediaQueries {
         this.#matchmedia();
     }
 
+    /**
+     * Holt die Singleton-Instanz. Beim ersten Aufruf müssen `breakpoints` übergeben werden.
+     * @param {BreakpointsConfig} [breakpoints]
+     * @returns {MediaQueries}
+     */
     static getInstance(breakpoints) {
         if (!MediaQueries.#instance) {
             if (!breakpoints) {

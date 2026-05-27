@@ -18,6 +18,10 @@ export class VwBody {
         document.documentElement.style.setProperty('--vw-body', `${this.vw}px`);
     }
 
+    /**
+     * Holt die Singleton-Instanz und initialisiert beim ersten Aufruf den Resize-Listener.
+     * @returns {VwBody}
+     */
     static getInstance() {
         if (!VwBody.#instance) {
             VwBody.#instance = new VwBody();

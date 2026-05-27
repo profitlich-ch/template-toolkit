@@ -1,5 +1,18 @@
 import './menu-toggle.scss';
 
+/**
+ * @typedef {Object} MenuToggleOptions
+ * @property {string}  menuButtonSelector       CSS-Selektor (`querySelector`) des Buttons, der das Menü öffnet/schliesst.
+ * @property {string}  menuSelector             CSS-Selektor (`querySelector`) des Menü-Containers.
+ * @property {string}  menuLinkSelector         CSS-Selektor für Menü-Links, die das Menü beim Klick schliessen (z.B. '.menu-link').
+ * @property {string}  menuItemSelector         CSS-Selektor des Menü-Wrappers; Klicks ausserhalb schliessen das Menü (z.B. '.menu').
+ * @property {string} [shiftElementSelector]    Optional: CSS-Selektor des Elements, das beim Öffnen um die Scrollbar-Breite verschoben/verbreitert wird, damit z.B. ein fixierter Header nicht springt.
+ * @property {number} [shiftDelay=0]            Verzögerung in Sekunden, bevor Scrollbar gemessen und Body fixiert wird – nützlich, wenn vorher noch eine CSS-Animation läuft, die die Scrollbar entfernt.
+ * @property {boolean} [deferPositionFixed=false] Setzt `data-menu-fixed` erst nach `shiftDelay` statt sofort. Nötig, wenn das Fixieren eine laufende Öffnungs-Animation stören würde.
+ * @property {boolean} [lockScroll=true]        Wenn `false`, bleibt das fixierende Element scrollbar; kein Scrollbar-Ausgleich und kein Shift. Für Menüs, die nur einen Teil der Seite bedecken und Hintergrund-Scroll erlauben sollen.
+ * @property {string} [fixElementSelector]      Optional: CSS-Selektor des Elements, das beim Öffnen fixiert wird (`position: fixed`, Scrollbar-Ausgleich, Scroll-Position-Trick). Default: `document.body`.
+ */
+
 export class MenuToggle {
     static #instance;
     #menuButton;
@@ -19,16 +32,7 @@ export class MenuToggle {
     isActive;
 
     /**
-     * @param {Object}  options
-     * @param {string}  options.menuButtonSelector    CSS-Selektor (`querySelector`) des Buttons, der das Menü öffnet/schliesst.
-     * @param {string}  options.menuSelector          CSS-Selektor (`querySelector`) des Menü-Containers.
-     * @param {string}  options.menuLinkSelector      CSS-Selektor für Menü-Links, die das Menü beim Klick schliessen (z.B. '.menu-link').
-     * @param {string}  options.menuItemSelector      CSS-Selektor des Menü-Wrappers; Klicks ausserhalb schliessen das Menü (z.B. '.menu').
-     * @param {string?} options.shiftElementSelector  Optional: CSS-Selektor des Elements, das beim Öffnen um die Scrollbar-Breite verschoben/verbreitert wird, damit z.B. ein fixierter Header nicht springt.
-     * @param {number}  options.shiftDelay            Verzögerung in Sekunden, bevor Scrollbar gemessen und Body fixiert wird – nützlich, wenn vorher noch eine CSS-Animation läuft, die die Scrollbar entfernt.
-     * @param {boolean} options.deferPositionFixed    Setzt `data-menu-fixed` erst nach `shiftDelay` statt sofort. Nötig, wenn das Fixieren eine laufende Öffnungs-Animation stören würde.
-     * @param {boolean} options.lockScroll            Wenn `false`, bleibt das fixierende Element scrollbar; kein Scrollbar-Ausgleich und kein Shift. Für Menüs, die nur einen Teil der Seite bedecken und Hintergrund-Scroll erlauben sollen.
-     * @param {string?} options.fixElementSelector    Optional: CSS-Selektor des Elements, das beim Öffnen fixiert wird (`position: fixed`, Scrollbar-Ausgleich, Scroll-Position-Trick). Default: `document.body`.
+     * @param {MenuToggleOptions} options
      */
     constructor({
         menuButtonSelector,
@@ -75,6 +79,13 @@ export class MenuToggle {
         this.#fixElement.setAttribute('data-menu-fixed', 'false');
     }
 
+    /**
+     * Holt die Singleton-Instanz. Beim ersten Aufruf müssen die Pflicht-Optionen
+     * (`menuButtonSelector`, `menuSelector`, `menuLinkSelector`, `menuItemSelector`)
+     * gesetzt sein; spätere Aufrufe ignorieren übergebene Optionen.
+     * @param {MenuToggleOptions} [options]
+     * @returns {MenuToggle}
+     */
     static getInstance(options) {
         if (!MenuToggle.#instance) {
             if (!options || !options.menuButtonSelector || !options.menuSelector || !options.menuLinkSelector || !options.menuItemSelector) {

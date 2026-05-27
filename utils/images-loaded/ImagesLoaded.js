@@ -9,6 +9,11 @@ export class ImagesLoaded {
     #attributeName;
     #attributeValue;
 
+    /**
+     * @param {string} selector              CSS-Selektor der zu beobachtenden `<img>`-Elemente.
+     * @param {string} [loadedAttribute='data-loaded']  Attribut, das den Ladestatus signalisiert.
+     * @param {string} [loadedValue='true']  Wert, der bei erfolgreichem Laden gesetzt wird.
+     */
     constructor(selector, loadedAttribute = 'data-loaded', loadedValue = 'true') {
         this.#selector = selector;
         this.#attributeName = loadedAttribute;

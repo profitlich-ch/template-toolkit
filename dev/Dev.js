@@ -3,7 +3,8 @@ import { Toolbar } from './toolbar/Toolbar.js';
 let _config = {};
 
 /**
-* @param {Object} config - Aus config.json des Projekts
+ * Hinterlegt die Projekt-Config für die Dev-Toolbar.
+ * @param {Object} [config={}] - Inhalt von `src/config.json` des Projekts.
  */
 export function initDev(config = {}) {
     _config = config;

@@ -1,8 +1,8 @@
 /**
- * 100vh problem
+ * Setzt die CSS Custom Property `--vh` auf 1% der aktuellen Viewport-Höhe und
+ * aktualisiert bei Resize. Workaround für mobiles 100vh.
  * https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
  */
-
 export class Vh100 {
     static #instance;
     vh = 0;
@@ -22,6 +22,10 @@ export class Vh100 {
         document.documentElement.style.setProperty('--vh', `${this.vh}px`);
     }
 
+    /**
+     * Holt die Singleton-Instanz und initialisiert beim ersten Aufruf den Resize-Listener.
+     * @returns {Vh100}
+     */
     static getInstance() {
         if (!Vh100.#instance) {
             Vh100.#instance = new Vh100();

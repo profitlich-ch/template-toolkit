@@ -2,6 +2,10 @@ import GUI from 'lil-gui';
 import { MediaQueries } from '../../utils/MediaQueries.js';
 import './toolbar.scss';
 
+/**
+ * Dev-Toolbar (lil-gui) mit Grid-Overlay, Bildgrössen- und Inhaltstyp-Labels.
+ * State wird in `localStorage.devTools` persistiert. Toggle via `Ctrl`.
+ */
 export class Toolbar {
     #mediaQueries = MediaQueries.getInstance();
     #gui;

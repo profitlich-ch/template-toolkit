@@ -1,7 +1,7 @@
 /**
- * after scroll set body attribute data-scrolled to true
+ * Setzt beim ersten Scroll-Event das Body-Attribut `data-body-scrolled="true"`
+ * und feuert das Custom-Event `eventBodyScrolled`. Einmal pro Seitenaufruf.
  */
-
 export class BodyScrolled {
     static #instance;
 
@@ -22,6 +22,10 @@ export class BodyScrolled {
 
     }
 
+    /**
+     * Holt die Singleton-Instanz und initialisiert beim ersten Aufruf den Scroll-Listener.
+     * @returns {BodyScrolled}
+     */
     static getInstance() {
         if (!BodyScrolled.#instance) {
             BodyScrolled.#instance = new BodyScrolled();
