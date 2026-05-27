@@ -157,6 +157,11 @@ export class MenuToggle {
         }
         this.#fixElement.style.top = `-${this.#y}px`;
         this.#fixElement.setAttribute('data-menu-fixed', 'true');
+        if (!this.#fixElementIsBody) {
+            // Bei nicht-body-Fix-Element bleibt der window-Scroll erhalten; ohne Reset
+            // erscheint ein absolut positioniertes Menü um den vorherigen Scroll-Betrag verschoben.
+            window.scrollTo(0, 0);
+        }
     }
 
     #adjustShiftElementWidth() {
