@@ -1,4 +1,4 @@
-import { fromFile } from '@capsizecss/unpack';
+import { fromFile } from '@capsizecss/unpack/fs';
 import { createStyleObject, getCapHeight } from '@capsizecss/core';
 import * as sass from 'sass';
 import { OrderedMap } from 'immutable';
