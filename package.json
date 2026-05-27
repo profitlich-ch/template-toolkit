@@ -3,6 +3,8 @@
     "version": "4.1.0",
     "description": "Shared SCSS layout system, JS utilities, components and build scripts for profitlich template repos",
     "type": "module",
+    "sass": "scss/forward.scss",
+    "style": "scss/forward.scss",
     "exports": {
         "./components/menu-toggle/MenuToggle": "./components/menu-toggle/MenuToggle.js",
         "./components/mux-player/MuxPlayer": "./components/mux-player/MuxPlayer.js",
