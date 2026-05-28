@@ -20,6 +20,28 @@ Code gehört ins **Toolkit**, wenn er in mehr als einem Projekt verwendet wird o
 
 Code bleibt im **Projekt**, wenn er projektspezifische Pfade, CSS-Klassen oder CMS-Eigenheiten enthält.
 
+### Toolkit-Release-Workflow
+
+Der Workflow trennt klar zwischen **inhaltlichem Commit** (Code-Change) und **Versions-Commit** (Release-Vorbereitung). Section-Reihenfolge im Changelog: `Breaking Changes` → `Added` → `Changed` → `Deprecated` → `Removed` → `Fixed` (leere Sections weglassen).
+
+**A) Im inhaltlichen Commit** (zusammen mit der Code-Änderung):
+
+- Stichpunkt unter `## [Unreleased]` in der passenden Section einfügen. Section anlegen, falls noch nicht vorhanden.
+- Bei `Breaking Changes`: gleich das Migrations-Diff (Vorher/Nachher als ```diff```-Block) und ggf. Hinweise auf zu migrierende DOM-Marker / CSS-Selektoren mitschreiben — solange der Kontext frisch ist.
+- Noch **keine** Versionsnummer, **kein** Datum, **kein** Compare-Link. `package.json` bleibt unangetastet.
+
+**B) Im Versions-Commit** (Release):
+
+1. SemVer-Entscheidung anhand der gefüllten Sections unter `## [Unreleased]`: Breaking Changes ⇒ Major, Added/Changed ⇒ Minor, nur Fixed ⇒ Patch.
+2. `## [Unreleased]` umbenennen zu `## [X.Y.Z] – YYYY-MM-DD`.
+3. Neue leere `## [Unreleased]`-Section direkt darüber einfügen.
+4. Am Dateiende die zwei Markdown-Referenz-Link-Zeilen anpassen (sie machen die `[X.Y.Z]` im Section-Header zu GitHub-Compare-Links):
+    - Neue Zeile anhängen: `[X.Y.Z]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/vPrev...vX.Y.Z`
+    - `[Unreleased]`-Zeile updaten: `…compare/vPrev...HEAD` → `…compare/vX.Y.Z...HEAD`
+5. `package.json` und `package-lock.json` auf `X.Y.Z` bumpen.
+6. Commit-Message: `X.Y.Z`. Tag `vX.Y.Z` setzen, publishen.
+7. In konsumierenden Projekten `package.json` updaten — beim Update nur die `CHANGELOG.md` von der bisherigen Version aufwärts lesen, um die nötigen Anpassungen zu erkennen.
+
 ## JavaScript
 
 - **Klassen bevorzugen** mit private Fields per `#`-Prefix – nie Underscore-Konvention (`_field`)
