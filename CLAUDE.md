@@ -20,6 +20,16 @@ Code gehört ins **Toolkit**, wenn er in mehr als einem Projekt verwendet wird o
 
 Code bleibt im **Projekt**, wenn er projektspezifische Pfade, CSS-Klassen oder CMS-Eigenheiten enthält.
 
+### Toolkit-Release-Checkliste
+
+Vor jedem Versions-Commit im Toolkit:
+
+1. **`CHANGELOG.md`** (im Toolkit-Root): neue Version-Section oben unter `## [Unreleased]` einfügen mit Datum (ISO) und Stichpunkten unter den passenden Sections — Reihenfolge `Breaking Changes` → `Added` → `Changed` → `Deprecated` → `Removed` → `Fixed` (leere Sections weglassen).
+2. **Bei Major-Bump** (Breaking Changes): unter `### Breaking Changes` ein Migrations-Diff (Vorher/Nachher als ```diff```-Block) ergänzen, der im konsumierenden Projekt copy-paste-tauglich ist. Wenn DOM-Marker, CSS-Selektoren oder ähnliches mit-migriert werden müssen: explizit dazuschreiben.
+3. **Version in `package.json`** nach SemVer bumpen: Major = Breaking Changes, Minor = Added/Changed, Patch = Fixed.
+4. **Compare-Link** am Ende der `CHANGELOG.md` für die neue Version ergänzen.
+5. Publishen, in konsumierenden Projekten `package.json` updaten — beim Update jeweils nur diese Datei lesen, um die nötigen Anpassungen zu erkennen.
+
 ## JavaScript
 
 - **Klassen bevorzugen** mit private Fields per `#`-Prefix – nie Underscore-Konvention (`_field`)
