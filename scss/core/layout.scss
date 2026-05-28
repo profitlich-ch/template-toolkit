@@ -88,7 +88,12 @@ $mediaqueries: (
     line-height: size($layout, $lineHeight);
 
     @if ($capsize != null) {
-        @include capsize($capsize, $fontSize, $lineHeight);
+        // 4. Argument ist der Capsize-Font-Name (String). Frühere API hatte hier font-weight.
+        @if meta.type-of($capsize) != 'string' {
+            @warn "font(): 4. Argument (Capsize-Font-Name) muss ein String sein, erhalten #{meta.type-of($capsize)} \"#{$capsize}\". Vermutlich Altlast aus früherer API (font-weight). Capsize wird übersprungen.";
+        } @else {
+            @include capsize($capsize, $fontSize, $lineHeight);
+        }
     }
 
 }

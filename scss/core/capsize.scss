@@ -1,14 +1,22 @@
+@use "sass:meta";
+
 // Emittiert die Capsize-Pseudo-Elemente (::before/::after mit Em-Trims)
 // für den aktuellen Selektor. Die Inhalte (welche Pseudo-Elemente, welche
 // Properties) kommen vollständig aus @capsizecss/core via der
 // Sass-Custom-Function capsize-pseudo-elements (registriert im
 // vite/capsizeSassFunctions.js des Toolkits).
 @mixin capsize($name, $fontSize, $lineHeight) {
-    $pseudo: capsize-pseudo-elements($name, $fontSize, $lineHeight);
-    @each $selector-suffix, $props in $pseudo {
-        &#{$selector-suffix} {
-            @each $prop, $val in $props {
-                #{$prop}: $val;
+    // Capsize ist opt-in: ohne registrierte Custom-Function wird übersprungen,
+    // damit ein fehlender Vite-Setup nicht zu kryptischem Sass-Fehler führt.
+    @if not meta.function-exists("capsize-pseudo-elements") {
+        @warn "Capsize ist nicht eingerichtet: Custom-Function capsize-pseudo-elements fehlt. Siehe template-toolkit/CLAUDE.md, Abschnitt Capsize. Aufruf für \"#{$name}\" wird übersprungen.";
+    } @else {
+        $pseudo: capsize-pseudo-elements($name, $fontSize, $lineHeight);
+        @each $selector-suffix, $props in $pseudo {
+            &#{$selector-suffix} {
+                @each $prop, $val in $props {
+                    #{$prop}: $val;
+                }
             }
         }
     }
