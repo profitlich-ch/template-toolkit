@@ -44,7 +44,7 @@ export class Toolbar {
             .onChange(() => this.#onStateChange());
 
         this.#gui.add(this.#state, 'sizes')
-            .name('sizes')
+            .name('Sizes')
             .onChange(() => this.#onStateChange());
 
         this.#gui.add(this.#state, 'contentType')
