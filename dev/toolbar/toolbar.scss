@@ -1,11 +1,15 @@
 @use "sass:map";
 @use "../../scss/forward" as *;
 
+// lil-gui z-index
+.lil-gui.lil-root {
+    z-index: 9999999;
+}
+
 // grid
 $color--dev-grid: rgba(0, 0, 255, 0.5);
 $color--dev-grid-ribbons: rgba(191, 255, 254, 0.5);
 $color--dev-grid-center: rgba(0, 0, 0, 0.2);
-
 
 @mixin dev-toolbar-grid($layout, $columns, $gutter, $margin-left, $margin-right) {
 
@@ -44,11 +48,6 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
                 linear-gradient(90deg, $color--dev-grid-ribbons calc(100% - $gutter), transparent 0.5px) calc($gutter / 2) 0,
         }
     }
-}
-
-// lil-gui z-index
-.lil-gui.root {
-    z-index: 9999999;
 }
 
 .dev-toolbar__grid {
@@ -91,6 +90,18 @@ picture {
         font-family: sans-serif;
         position: absolute;
         top: 10px;
+        left: 10px;
+        color: white;
+        font-size: 20px;
+        text-shadow: 0 0 10px black;
+        z-index: 10;
+    }
+
+    &::after{
+        content: attr(data-dev-sizes);
+        font-family: sans-serif;
+        position: absolute;
+        top: 34px;
         left: 10px;
         color: white;
         font-size: 20px;

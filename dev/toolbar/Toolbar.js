@@ -15,7 +15,7 @@ export class Toolbar {
 
     constructor() {
         // State aus localStorage laden
-        const defaults = { visible: false, grid: 'aus', imageSize: false, contentType: false };
+        const defaults = { visible: false, grid: 'aus', imageSize: false, sizes: false, contentType: false };
         const saved = localStorage.getItem('devTools');
         this.#state = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
 
@@ -42,7 +42,11 @@ export class Toolbar {
         this.#gui.add(this.#state, 'imageSize')
             .name('Bildgrössen')
             .onChange(() => this.#onStateChange());
-        
+
+        this.#gui.add(this.#state, 'sizes')
+            .name('sizes')
+            .onChange(() => this.#onStateChange());
+
         this.#gui.add(this.#state, 'contentType')
             .name('Inhaltstypen')
             .onChange(() => this.#onStateChange());
@@ -73,6 +77,7 @@ export class Toolbar {
         document.body.setAttribute('data-dev-grid', this.#state.grid);
         document.body.setAttribute('data-dev-content-types', this.#state.contentType);
         this.#updateImageSize();
+        this.#updateSizes();
         this.#updateContentTypeLabels();
     }
 
@@ -109,9 +114,35 @@ export class Toolbar {
         }
     }
 
+    #updateSizes() {
+        if (!this.#pictureElements) return;
+        const pictures = Array.from(this.#pictureElements);
+        if (this.#state.sizes) {
+            pictures.forEach((picture) => {
+                const sizes = picture.querySelector('img')?.getAttribute('sizes');
+                if (!sizes) {
+                    picture.setAttribute('data-dev-sizes', '');
+                    return;
+                }
+                // Media-Conditions in Klammern entfernen, nur die Längenwerte behalten
+                const shortened = sizes
+                    .split(',')
+                    .map(part => part.replace(/\([^)]*\)/g, '').trim())
+                    .filter(Boolean)
+                    .join(' / ');
+                picture.setAttribute('data-dev-sizes', shortened);
+            });
+        } else {
+            pictures.forEach((picture) => {
+                picture.setAttribute('data-dev-sizes', '');
+            });
+        }
+    }
+
     #onResize = () => {
         this.#gui.title(this.#getViewportText());
         this.#updateImageSize();
+        this.#updateSizes();
         this.#updateContentTypeLabels();
     }
 
