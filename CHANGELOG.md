@@ -8,6 +8,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **MenuToggle**: Neue Option `linkClickClosesMenu` (default `true`). Bei `false` bleibt das Menü beim Klick auf einen `menuLinkSelector`-Link offen. Default bewahrt das bisherige Verhalten.
+
 ## [5.3.3] – 2026-05-28
 
 ### Added

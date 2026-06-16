@@ -6,6 +6,7 @@ import './menu-toggle.scss';
  * @property {string}  menuSelector             CSS-Selektor (`querySelector`) des Menü-Containers.
  * @property {string}  menuLinkSelector         CSS-Selektor für Menü-Links, die das Menü beim Klick schliessen (z.B. '.menu-link').
  * @property {string}  menuItemSelector         CSS-Selektor des Menü-Wrappers; Klicks ausserhalb schliessen das Menü (z.B. '.menu').
+ * @property {boolean} [linkClickClosesMenu=true] Wenn `false`, bleibt das Menü beim Klick auf einen `menuLinkSelector`-Link offen. Default `true` = Menü schliesst beim Link-Klick.
  * @property {string} [shiftElementSelector]    Optional: CSS-Selektor des Elements, das beim Öffnen um die Scrollbar-Breite verschoben/verbreitert wird, damit z.B. ein fixierter Header nicht springt.
  * @property {number} [shiftDelay=0]            Verzögerung in Sekunden, bevor Scrollbar gemessen und Body fixiert wird – nützlich, wenn vorher noch eine CSS-Animation läuft, die die Scrollbar entfernt.
  * @property {boolean} [deferPositionFixed=false] Setzt `data-menu-fixed` erst nach `shiftDelay` statt sofort. Nötig, wenn das Fixieren eine laufende Öffnungs-Animation stören würde.
@@ -19,6 +20,7 @@ export class MenuToggle {
     #menu;
     #menuLinkSelector;
     #menuItemSelector;
+    #linkClickClosesMenu;
     #scrollbarWidth;
     #shiftElement;
     #shiftDelay;
@@ -40,6 +42,7 @@ export class MenuToggle {
         menuSelector,
         menuLinkSelector,
         menuItemSelector,
+        linkClickClosesMenu = true,
         shiftElementSelector = null,
         shiftDelay = 0,
         deferPositionFixed = false,
@@ -50,6 +53,7 @@ export class MenuToggle {
         this.#menu = document.querySelector(menuSelector);
         this.#menuLinkSelector = menuLinkSelector;
         this.#menuItemSelector = menuItemSelector;
+        this.#linkClickClosesMenu = linkClickClosesMenu;
         this.#shiftElement = shiftElementSelector ? document.querySelector(shiftElementSelector) : null;
         this.#shiftDelay = shiftDelay * 1000;
         this.#deferPositionFixed = deferPositionFixed;
@@ -71,7 +75,7 @@ export class MenuToggle {
         });
 
         this.#menu.addEventListener('click', (event) => {
-            if (this.isActive && event.target.matches(this.#menuLinkSelector)) {
+            if (this.#linkClickClosesMenu && this.isActive && event.target.matches(this.#menuLinkSelector)) {
                 this.#toggleMenu();
             }
         });
