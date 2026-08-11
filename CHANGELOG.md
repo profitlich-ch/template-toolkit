@@ -8,6 +8,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+- **Entwicklungskonventionen**: `git mv`, Commit-Message-Stil und der Ablauf des Release-Workflows stehen jetzt in der globalen `~/.claude/CLAUDE.md`; die `CLAUDE.md` dieses Repos führt nur noch die Besonderheiten des Pakets. Die bisherige Regel «Branches und Commits nie von Claude» ist entfallen — global gilt: Commits nur auf Aufforderung oder nach Rückfrage. Wirkt ohne Release, ab dem nächsten `git pull`.
+
 ## [5.4.0] – 2026-06-16
 
 ### Added
