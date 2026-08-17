@@ -8,6 +8,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+- **`syncConventions()` schreibt nicht mehr in die Vorlagen-Repos.** `template-craftcms` und `template-kirbycms` haben eigenen Quellcode und laufen bei ihrer Entwicklung durch denselben `copy`-Task — der Block landete dort also bei jedem `npm run dev`. Damit stand derselbe Text zusätzlich in der Vorlage, als Schnappschuss, der wie die Quelle aussieht, beim Ableiten aber ohnehin überschrieben wird. Erkannt wird das am Verzeichnisnamen; die Vorlagen geben nur noch das leere Markenpaar weiter.
+
 ## [5.5.0] – 2026-08-17
 
 ### Added

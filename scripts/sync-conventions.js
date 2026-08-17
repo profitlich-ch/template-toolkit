@@ -8,6 +8,9 @@ const paketDatei = path.join(paketWurzel, 'package.json');
 const markeStart = '<!-- toolkit:start';
 const markeEnde = '<!-- toolkit:end -->';
 
+/** Repos, die selbst Vorlage sind und den Block deshalb nicht erhalten. */
+const vorlagenRepos = ['template-craftcms', 'template-kirbycms'];
+
 /**
  * Schreibt die geerbten Konventionen in die `CLAUDE.md` des Projekts.
  *
@@ -37,6 +40,14 @@ const markeEnde = '<!-- toolkit:end -->';
  * @returns {Promise<boolean>} `true`, wenn geschrieben wurde.
  */
 export async function syncConventions(options = {}) {
+    // Die Vorlagen haben eigenen Quellcode und laufen bei ihrer Entwicklung durch
+    // denselben copy-Task. Dort soll nur das leere Markenpaar liegen: Ein
+    // abgeleitetes Projekt erbt es und füllt es beim ersten copy-Lauf aus seiner
+    // eigenen Toolkit-Version. Stünde der Block schon in der Vorlage, läge
+    // derselbe Text doppelt unter Versionskontrolle — als Schnappschuss, der wie
+    // die Quelle aussieht, aber beim Ableiten ohnehin überschrieben wird.
+    if (vorlagenRepos.includes(path.basename(process.cwd()))) return false;
+
     const zielPfad = path.resolve(options.target ?? 'CLAUDE.md');
 
     const quellDateien = [path.join(paketWurzel, 'CLAUDE.project.md')];
