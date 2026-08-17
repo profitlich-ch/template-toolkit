@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [5.5.1] – 2026-08-17
+
 ### Fixed
 - **`syncConventions()` schreibt nicht mehr in die Vorlagen-Repos.** `template-craftcms` und `template-kirbycms` haben eigenen Quellcode und laufen bei ihrer Entwicklung durch denselben `copy`-Task — der Block landete dort also bei jedem `npm run dev`. Damit stand derselbe Text zusätzlich in der Vorlage, als Schnappschuss, der wie die Quelle aussieht, beim Ableiten aber ohnehin überschrieben wird. Erkannt wird das am Verzeichnisnamen; die Vorlagen geben nur noch das leere Markenpaar weiter.
 
@@ -126,7 +128,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.1...HEAD
+[5.5.1]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.0...v5.5.1
 [5.5.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.4.0...v5.5.0
 [5.4.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.3...v5.4.0
 [5.3.3]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.2...v5.3.3
