@@ -8,8 +8,28 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **Konventionen für Konsumenten reisen im Paket mit**: `CLAUDE.project.md` (alle Projekte), `CLAUDE.craftcms.md` und `CLAUDE.kirbycms.md`. `scripts/sync-conventions.js` schreibt sie beim `copy`-Lauf des Konsumenten zwischen die Marken `<!-- toolkit:start -->` und `<!-- toolkit:end -->` seiner `CLAUDE.md`. Kopiert statt verlinkt, weil Claude keine Dateien aus `node_modules` liest.
+
+    Der Block hängt an der installierten Paketversion, nicht am neuesten Stand: Ein Projekt zieht Änderungen erst beim Versions-Bump, und dann sichtbar als git-Diff. Deshalb liegen die Sorten-Dateien hier und nicht in den Template-Repos — npm ist an eine Version gebunden, ein lokal geklontes Repo kann veraltet sein, ohne dass es auffällt.
+
+    Aktivieren im Konsumenten — ohne diese zwei Schritte passiert nichts:
+
+    ```diff
+    # CLAUDE.md
+    +<!-- toolkit:start -->
+    +<!-- toolkit:end -->
+
+    # scripts/copy-files.js
+    -run(copyTasks);
+    +run(copyTasks, { template: 'craftcms' });   // oder 'kirbycms'
+    ```
+
+    Alles ausserhalb der Marken bleibt unangetastet und geht im Konfliktfall vor. Fehlen die Marken, wird nur ein Hinweis ausgegeben.
+
 ### Changed
 - **Entwicklungskonventionen**: `git mv`, Commit-Message-Stil und der Ablauf des Release-Workflows stehen jetzt in der globalen `~/.claude/CLAUDE.md`; die `CLAUDE.md` dieses Repos führt nur noch die Besonderheiten des Pakets. Die bisherige Regel «Branches und Commits nie von Claude» ist entfallen — global gilt: Commits nur auf Aufforderung oder nach Rückfrage. Wirkt ohne Release, ab dem nächsten `git pull`.
+- **`run()` in `scripts/copy-files.js`** ruft den Konventions-Sync vorab auf und nimmt dafür zwei neue Optionen entgegen: `template` (`'craftcms'` | `'kirbycms'`) und `syncConventions: false` zum Abschalten. Ohne Marken in der `CLAUDE.md` verhält sich `run()` wie bisher.
 
 ## [5.4.0] – 2026-06-16
 

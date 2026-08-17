@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import { glob } from 'glob';
 import path from 'path';
 import chokidar from 'chokidar';
+import { syncConventions } from './sync-conventions.js';
 
 /**
  * @typedef {Object} CopyTask
@@ -78,17 +79,28 @@ export function watchFiles(copyTasks, watchDir = 'src') {
  * Run the copy-files script.
  * Liest `process.argv[2]`: `dev` startet einmal `copyAll` und danach `watchFiles`,
  * `build` führt `copyAll` einmal aus.
+ *
+ * Übernimmt vorab die geerbten Konventionen in die `CLAUDE.md` des Projekts —
+ * hier statt in jedem Projekt einzeln verdrahtet, damit bestehende Projekte
+ * nichts anpassen müssen. Ohne Marken in der Zieldatei passiert nichts.
  * @param {CopyTask[]} copyTasks
  * @param {Object}   [options]
  * @param {string}   [options.watchDir='src'] - Im Dev-Mode beobachtetes Verzeichnis.
+ * @param {string}   [options.template] - Sorte für den Konventionsblock, z.B. `craftcms`.
+ * @param {boolean}  [options.syncConventions=true] - Konventionsblock schreiben.
  */
 export function run(copyTasks, options = {}) {
     const command = process.argv[2];
     const watchDir = options.watchDir || 'src';
 
+    const vorlauf = options.syncConventions === false
+        ? Promise.resolve()
+        : syncConventions({ template: options.template })
+            .catch(err => console.error('Konventionen nicht übernommen:', err));
+
     if (command === 'dev') {
-        copyAll(copyTasks).then(() => watchFiles(copyTasks, watchDir));
+        vorlauf.then(() => copyAll(copyTasks)).then(() => watchFiles(copyTasks, watchDir));
     } else if (command === 'build') {
-        copyAll(copyTasks);
+        vorlauf.then(() => copyAll(copyTasks));
     }
 }

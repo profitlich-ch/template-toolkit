@@ -27,6 +27,9 @@
         "./vite/capsizeSassFunctions": "./vite/capsizeSassFunctions.js"
     },
     "files": [
+        "CLAUDE.project.md",
+        "CLAUDE.craftcms.md",
+        "CLAUDE.kirbycms.md",
         "components/",
         "dev/",
         "scss/",
