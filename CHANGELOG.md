@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [5.7.0] – 2026-08-18
+
 ### Changed
 - **Regel zum Debug-Code in `CLAUDE.project.md` ergänzt.** Er bleibt im Quelltext und auf Staging vollständig erhalten, darf aber die Produktion nicht erreichen. `console.*` erledigt `drop_console`; alles andere gehört in `if (__DEBUG__) { … }`, mit `define: { __DEBUG__: mode !== 'production' }` in der `vite.config.js`.
 
@@ -146,7 +148,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.6.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.7.0...HEAD
+[5.7.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.6.0...v5.7.0
 [5.6.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.1...v5.6.0
 [5.5.1]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.0...v5.5.1
 [5.5.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.4.0...v5.5.0
