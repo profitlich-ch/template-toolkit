@@ -3,6 +3,22 @@ import { MediaQueries } from '../../utils/MediaQueries.js';
 import './toolbar.scss';
 
 /**
+ * Beschreibt eine projekteigene Checkbox in der Dev-Toolbar.
+ * @typedef {Object} ToolbarToggle
+ * @property {string} key - Schlüssel im State und in `localStorage.devTools`.
+ * @property {string} name - Beschriftung in der Toolbar.
+ * @property {string} [attribute] - Data-Attribut am `<body>`. Ohne Angabe aus dem
+ *   Schlüssel abgeleitet: `navigateSpace` → `data-dev-navigate-space`.
+ * @property {boolean} [default=false] - Startwert, solange nichts gespeichert ist.
+ */
+
+/**
+ * Optionen, mit denen ein Projekt die Toolbar erweitert.
+ * @typedef {Object} ToolbarOptions
+ * @property {ToolbarToggle[]} [toggles=[]] - Zusätzliche Checkboxen.
+ */
+
+/**
  * Dev-Toolbar (lil-gui) mit Grid-Overlay, Bildgrössen- und Inhaltstyp-Labels.
  * State wird in `localStorage.devTools` persistiert. Toggle via `Ctrl`.
  */
@@ -12,10 +28,19 @@ export class Toolbar {
     #state;
     #pictureElements;
     #contentTypeContainer;
+    #toggles;
 
-    constructor() {
+    /**
+     * @param {ToolbarOptions} [options={}] - Projekteigene Ergänzungen.
+     */
+    constructor(options = {}) {
+        this.#toggles = options.toggles ?? [];
+
         // State aus localStorage laden
         const defaults = { visible: false, grid: 'aus', imageSize: false, sizes: false, contentType: false };
+        for (const toggle of this.#toggles) {
+            defaults[toggle.key] = toggle.default ?? false;
+        }
         const saved = localStorage.getItem('devTools');
         this.#state = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
 
@@ -51,6 +76,14 @@ export class Toolbar {
             .name('Inhaltstypen')
             .onChange(() => this.#onStateChange());
 
+        // Projekteigene Schalter ans Ende, damit die Reihenfolge der festen
+        // Einträge über alle Projekte hinweg gleich bleibt
+        for (const toggle of this.#toggles) {
+            this.#gui.add(this.#state, toggle.key)
+                .name(toggle.name)
+                .onChange(() => this.#onStateChange());
+        }
+
         // State anwenden
         this.#applyState();
 
@@ -76,6 +109,7 @@ export class Toolbar {
     #applyState() {
         document.body.setAttribute('data-dev-grid', this.#state.grid);
         document.body.setAttribute('data-dev-content-types', this.#state.contentType);
+        this.#applyToggles();
         this.#updateImageSize();
         this.#updateSizes();
         this.#updateContentTypeLabels();
@@ -93,6 +127,25 @@ export class Toolbar {
             label.style.top = `${rect.top + window.scrollY}px`;
             this.#contentTypeContainer.appendChild(label);
         });
+    }
+
+    /**
+     * Schreibt jeden projekteigenen Schalter als Data-Attribut ans `<body>` und
+     * meldet ihn zusätzlich per Event.
+     *
+     * Beides, weil beide Seiten gebraucht werden: Das Attribut genügt für reines
+     * CSS und gilt auch für Listener, die es zum Zeitpunkt des Umschaltens noch
+     * nicht gab; das Event erreicht Module, die auf den Wechsel reagieren müssen,
+     * statt ihn nur darzustellen.
+     */
+    #applyToggles() {
+        for (const toggle of this.#toggles) {
+            const value = this.#state[toggle.key];
+            document.body.setAttribute(toggleAttribute(toggle), String(value));
+            document.dispatchEvent(new CustomEvent('eventDevToggle', {
+                detail: { key: toggle.key, value },
+            }));
+        }
     }
 
     #saveState() {
@@ -158,4 +211,15 @@ export class Toolbar {
             this.#saveState();
         }
     }
+}
+
+/**
+ * Liefert das Data-Attribut eines Schalters — die explizite Angabe, sonst aus dem
+ * Schlüssel abgeleitet: `navigateSpace` → `data-dev-navigate-space`.
+ * @param {ToolbarToggle} toggle
+ * @returns {string}
+ */
+function toggleAttribute(toggle) {
+    return toggle.attribute
+        ?? `data-dev-${toggle.key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)}`;
 }

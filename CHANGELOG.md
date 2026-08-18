@@ -8,6 +8,21 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+- **Die Dev-Toolbar lässt sich aus dem Projekt um eigene Checkboxen erweitern.** `initDev(config, { toggles: [...] })` nimmt Beschreibungen aus `{ key, name, attribute?, default? }` entgegen; die Toolbar baut daraus Checkboxen, persistiert sie zusammen mit dem übrigen State in `localStorage.devTools` und macht den Wert auf zwei Wegen verfügbar: als Data-Attribut am `<body>` und als `eventDevToggle` mit `{ key, value }` im `detail`.
+
+    Ohne `attribute` wird der Name aus dem Schlüssel abgeleitet — `navigateSpace` → `data-dev-navigate-space`. Die festen Einträge behalten ihre Reihenfolge, projekteigene Schalter hängen sich hinten an.
+
+    ```js
+    initDev(config, {
+        toggles: [{ key: 'navigateSpace', name: 'Navigate Space' }],
+    });
+    ```
+
+    Beide Wege, weil beide gebraucht werden: Das Attribut genügt für reines CSS und gilt auch für Listener, die es beim Umschalten noch nicht gab; das Event erreicht Module, die auf den Wechsel reagieren müssen, statt ihn nur darzustellen.
+
+    `initDev` bleibt abwärtskompatibel — der zweite Parameter ist optional, bestehende Aufrufe ändern sich nicht.
+
 ## [5.7.0] – 2026-08-18
 
 ### Changed

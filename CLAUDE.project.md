@@ -80,6 +80,19 @@ An `mode` hängen, **nicht** an `import.meta.env.DEV` — Letzteres ist auf Stag
 
 Ganze Dateien, die nur der Entwicklung dienen, werden gar nicht erst geladen: `{% if craft.app.env != 'production' %}` um die Registrierung, wie bei `Dev.js`.
 
+**Debug-Anzeigen schaltbar machen** — nicht dauerhaft einblenden. Die Dev-Toolbar nimmt dafür projekteigene Checkboxen entgegen:
+
+```js
+// src/Dev.js
+initDev(config, {
+    toggles: [{ key: 'navigateSpace', name: 'Navigate Space' }],
+});
+```
+
+Der Wert steht danach als `body[data-dev-navigate-space="true"]` bereit — für reine CSS-Anzeigen genügt das, weiteres JS braucht es nicht. Module, die auf den Wechsel *reagieren* müssen statt ihn nur darzustellen, hören auf `eventDevToggle` und lesen `event.detail.key` und `event.detail.value`.
+
+Der Schalter ersetzt nicht `__DEBUG__`, er ergänzt es: `__DEBUG__` entscheidet, ob der Code überhaupt ausgeliefert wird, der Schalter, ob man ihn gerade sehen will.
+
 Ist ESLint eingerichtet, braucht `__DEBUG__` einen Eintrag unter `languageOptions.globals`, sonst meldet `no-undef`.
 
 ### SCSS
