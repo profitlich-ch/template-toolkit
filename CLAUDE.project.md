@@ -65,6 +65,23 @@ Eine JS-Datei ist das eine oder das andere, nie beides:
 
 Vermischt man beides, wird ein Import zur versteckten Ladeanweisung: Er sieht ungenutzt aus, ist aber das Einzige, was die Funktion startet. Wer ihn entfernt — oder ein Linter, der ihn meldet — legt sie lautlos still.
 
+### Debug-Code
+
+Debug-Code bleibt im Quelltext — man braucht ihn beim nächsten Mal wieder. Er darf nur die **Produktion** nicht erreichen; auf Dev **und Staging** bleibt er vollständig erhalten.
+
+Dafür zwei Hebel, je nach Fall:
+
+- **`console.*`** — entfernt Terser beim Produktions-Build über `drop_console: mode === 'production'` in der `vite.config.js`. Kein Zutun nötig.
+- **Alles andere** (Debug-Ausgaben ins DOM, Messungen, Overlays) — in `if (__DEBUG__) { … }` einschliessen. Vite ersetzt die Konstante zur Bauzeit per `define: { __DEBUG__: mode !== 'production' }`; daraus wird `if (false)`, und der Minifier wirft den Zweig weg.
+
+An `mode` hängen, **nicht** an `import.meta.env.DEV` — Letzteres ist auf Staging bereits `false` und würde den Debug-Code dort verschlucken.
+
+**Debug-Funktionen auf Modulebene schreiben, nicht als private Klassenmethoden.** Der Minifier entfernt zwar in beiden Fällen den Aufruf, schüttelt ungenutzte private Klassenmethoden aber nicht ab — deren Rumpf bliebe im Produktions-Bundle liegen. Als Funktion verschwindet er vollständig.
+
+Ganze Dateien, die nur der Entwicklung dienen, werden gar nicht erst geladen: `{% if craft.app.env != 'production' %}` um die Registrierung, wie bei `Dev.js`.
+
+Ist ESLint eingerichtet, braucht `__DEBUG__` einen Eintrag unter `languageOptions.globals`, sonst meldet `no-undef`.
+
 ### SCSS
 
 - Nie direkte `px`-, `vw`- oder `rem`-Werte — ausschliesslich Toolkit-Funktionen: `size()`, `columns()`, `font()`, `marginPadding()`.

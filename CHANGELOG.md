@@ -8,6 +8,13 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+- **Regel zum Debug-Code in `CLAUDE.project.md` ergänzt.** Er bleibt im Quelltext und auf Staging vollständig erhalten, darf aber die Produktion nicht erreichen. `console.*` erledigt `drop_console`; alles andere gehört in `if (__DEBUG__) { … }`, mit `define: { __DEBUG__: mode !== 'production' }` in der `vite.config.js`.
+
+    Dazu zwei Feinheiten, die man sonst zweimal lernt: An `mode` hängen und nicht an `import.meta.env.DEV`, weil Letzteres auf Staging schon `false` ist. Und Debug-Funktionen auf Modulebene schreiben statt als private Klassenmethoden — der Minifier entfernt zwar in beiden Fällen den Aufruf, schüttelt ungenutzte private Methoden aber nicht ab, deren Rumpf bliebe im Bundle liegen.
+
+    Das `define` gehört in die `vite.config.js` jedes Projekts und ist deshalb in `template-craftcms` und `template-kirbycms` eingetragen; über das Paket verteilen lässt es sich nicht.
+
 ## [5.6.0] – 2026-08-18
 
 ### Changed
