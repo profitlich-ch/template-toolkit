@@ -22,7 +22,48 @@ Dieser Abschnitt stammt aus `@profitlich/template-toolkit` und wird bei jedem `c
 
 - Zustandskommunikation zwischen Komponenten über `CustomEvent`, nicht direkte Methodenaufrufe.
 - Event-Namenskonvention: `event` + PascalCase → `eventMenuStatus`, `eventBodyScrolled`.
-- DOM-Zustand per `data-*`-Attribut, nie als CSS-Klassen-Toggle: `document.body.setAttribute('data-menu-active', 'true')`.
+- DOM-**Zustand** per `data-*`-Attribut, nie als CSS-Klassen-Toggle: `document.body.setAttribute('data-menu-active', 'true')`.
+
+Das betrifft den Zustand eines Elements. Wie ein Skript seine Elemente überhaupt **findet**, regelt der nächste Abschnitt.
+
+### Wie JavaScript seine Elemente findet
+
+Zwei Fragen, die leicht durcheinandergeraten:
+
+*Welches Skript lädt diese Seite?* → immer `craft.vite.register` im Template, das das Markup rendert. Gilt unabhängig von allem Folgenden.
+
+*Woran erkennt das Skript seine Elemente?* → dafür gilt:
+
+> **Wer entscheidet, dort steht es.** Entscheidet der Code, steht der Selektor im Code. Entscheidet der Inhalt, steht es im Markup.
+
+**Klassen-Selektor**, wenn das Verhalten untrennbar zur Komponente gehört — jedes Element dieser Klasse verhält sich immer so, es gibt nichts zu entscheiden:
+
+```js
+new Subcategory('.subcategory');
+new HoverImages('.client-list__link');
+```
+
+**`data`-Attribut**, sobald eine der beiden Bedingungen zutrifft:
+
+1. **Die Redaktion entscheidet, ob.** Ein CMS-Feld schaltet das Verhalten — `module.fixiert` → `data-sticky`, `module.raster` → `data-grid-type`. Der Code kann das nicht wissen.
+2. **Das Element trägt einen Wert**, den das Skript braucht — `data-hover-image`, `data-categories`, `data-map-zoom`.
+
+Fallen beide zusammen, ist der Selektor das Attribut:
+
+```js
+new Grid('[data-grid-type]');
+```
+
+Nicht überall Attribute: Ein `data-swiper="true"` an jeder `.subcategory` wäre eine zweite Stelle zum Ändern und suggeriert eine Wahlmöglichkeit, die es nicht gibt. Nicht überall Selektoren: Redaktionelle Entscheidungen und Werte pro Element kann der Code nicht kennen.
+
+### Entry oder Klassendatei
+
+Eine JS-Datei ist das eine oder das andere, nie beides:
+
+- **Entry** — initialisiert sich selbst auf `DOMContentLoaded` und wird von keinem Modul importiert. Geladen durch `craft.vite.register`.
+- **Klassendatei** — wird importiert und tut nichts, bis jemand sie konstruiert.
+
+Vermischt man beides, wird ein Import zur versteckten Ladeanweisung: Er sieht ungenutzt aus, ist aber das Einzige, was die Funktion startet. Wer ihn entfernt — oder ein Linter, der ihn meldet — legt sie lautlos still.
 
 ### SCSS
 

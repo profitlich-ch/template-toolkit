@@ -8,6 +8,15 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+- **Zwei Regeln zur Modul-Architektur in `CLAUDE.project.md` ergänzt.** Beide standen bisher nirgends, obwohl der Code sie durchgängig befolgt — dadurch wirkte die Mischung willkürlich und lud zu Abweichungen ein.
+
+    *Wie JavaScript seine Elemente findet:* Entscheidet der Code, steht der Selektor im Code (`new Subcategory('.subcategory')`). Entscheidet der Inhalt — weil ein CMS-Feld das Verhalten schaltet oder das Element einen Wert trägt —, steht es im Markup (`data-sticky`, `data-hover-image`). Fallen beide zusammen, ist der Selektor das Attribut: `new Grid('[data-grid-type]')`.
+
+    *Entry oder Klassendatei:* Eine Datei ist das eine oder das andere, nie beides. Ein Entry initialisiert sich selbst und wird von niemandem importiert; eine Klassendatei wird importiert und tut nichts von allein. Vermischt man beides, wird ein Import zur versteckten Ladeanweisung — er sieht ungenutzt aus, startet aber die Funktion.
+
+    Der bestehende Punkt zu `data-*` ist als *Zustand* präzisiert, um ihn vom *Auffinden* abzugrenzen.
+
 ## [5.5.1] – 2026-08-17
 
 ### Fixed
