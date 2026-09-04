@@ -65,7 +65,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/profitlich-ch/profitlich-template-toolkit.git"
+        "url": "git+https://github.com/profitlich-ch/template-toolkit.git"
     },
     "license": "MIT"
 }

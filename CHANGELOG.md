@@ -8,6 +8,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+
+- **Repository-URL auf den heutigen Pfad gezogen** — in `package.json` und in allen Compare-Links am Ende dieser Datei. Sie zeigten auf `profitlich-ch/profitlich-template-toolkit`; das Repo heisst seit einer Umbenennung `profitlich-ch/template-toolkit`. GitHub fing das mit einer 301-Weiterleitung auf, die Links funktionierten also — eine Weiterleitung ist aber nichts, worauf man sich dauerhaft stützt.
+
 ## [6.0.0] – 2026-09-04
 
 ### Breaking Changes
@@ -205,21 +209,21 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v6.0.0...HEAD
-[6.0.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.8.0...v6.0.0
-[5.8.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.7.0...v5.8.0
-[5.7.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.6.0...v5.7.0
-[5.6.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.1...v5.6.0
-[5.5.1]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.0...v5.5.1
-[5.5.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.4.0...v5.5.0
-[5.4.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.3...v5.4.0
-[5.3.3]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.2...v5.3.3
-[5.3.2]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.1...v5.3.2
-[5.3.1]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.3.0...v5.3.1
-[5.3.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.2.3...v5.3.0
-[5.2.3]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.2.2...v5.2.3
-[5.2.2]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.2.1...v5.2.2
-[5.2.1]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.2.0...v5.2.1
-[5.2.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.1.0...v5.2.0
-[5.1.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.0.0...v5.1.0
-[5.0.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/releases/tag/v5.0.0
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...HEAD
+[6.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.8.0...v6.0.0
+[5.8.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.7.0...v5.8.0
+[5.7.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.6.0...v5.7.0
+[5.6.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.5.1...v5.6.0
+[5.5.1]: https://github.com/profitlich-ch/template-toolkit/compare/v5.5.0...v5.5.1
+[5.5.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.4.0...v5.5.0
+[5.4.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.3.3...v5.4.0
+[5.3.3]: https://github.com/profitlich-ch/template-toolkit/compare/v5.3.2...v5.3.3
+[5.3.2]: https://github.com/profitlich-ch/template-toolkit/compare/v5.3.1...v5.3.2
+[5.3.1]: https://github.com/profitlich-ch/template-toolkit/compare/v5.3.0...v5.3.1
+[5.3.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.2.3...v5.3.0
+[5.2.3]: https://github.com/profitlich-ch/template-toolkit/compare/v5.2.2...v5.2.3
+[5.2.2]: https://github.com/profitlich-ch/template-toolkit/compare/v5.2.1...v5.2.2
+[5.2.1]: https://github.com/profitlich-ch/template-toolkit/compare/v5.2.0...v5.2.1
+[5.2.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.1.0...v5.2.0
+[5.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.0.0...v5.1.0
+[5.0.0]: https://github.com/profitlich-ch/template-toolkit/releases/tag/v5.0.0
