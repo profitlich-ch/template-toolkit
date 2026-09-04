@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [6.0.0] – 2026-09-04
+
 ### Breaking Changes
 
 - **Das Grid-Overlay der Dev-Toolbar zeichnet als Canvas statt als CSS-Gradient.** Die Auswahl im Panel bleibt unverändert (`aus` / `lines` / `ribbons`), ebenso das Data-Attribut `data-dev-grid` am `<body>`. Geändert hat sich, was darunter passiert — und drei Dinge, die ein Projekt betreffen können:
@@ -203,7 +205,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.8.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v6.0.0...HEAD
+[6.0.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.8.0...v6.0.0
 [5.8.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.7.0...v5.8.0
 [5.7.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.6.0...v5.7.0
 [5.6.0]: https://github.com/profitlich-ch/profitlich-template-toolkit/compare/v5.5.1...v5.6.0
