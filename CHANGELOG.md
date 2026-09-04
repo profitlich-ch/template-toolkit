@@ -8,6 +8,44 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **Das Grid-Overlay der Dev-Toolbar zeichnet als Canvas statt als CSS-Gradient.** Die Auswahl im Panel bleibt unverändert (`aus` / `lines` / `ribbons`), ebenso das Data-Attribut `data-dev-grid` am `<body>`. Geändert hat sich, was darunter passiert — und drei Dinge, die ein Projekt betreffen können:
+
+    **1. `initDev` braucht die Config.** Der erste Parameter wurde bisher entgegengenommen und nie gelesen; jetzt leitet das Overlay Spaltenzahl, Gutter und Seitenränder daraus ab. Beide Vorlagen rufen bereits `initDev(config)` auf, hier ist also nichts zu tun. Wer ohne Argument aufruft, verliert das Raster und bekommt eine Konsolenwarnung:
+
+    ```diff
+    -initDev();
+    +import config from './config.json';
+    +initDev(config);
+    ```
+
+    **2. `.dev-toolbar__grid` hat eine andere Geometrie.** Das Element spannte bisher den vollen Viewport auf und rückte das Raster über ein `::after` mit Rändern ein; jetzt spannt es selbst genau die Rasterbreite auf, und das `::after` ist ersatzlos entfallen. Wer eigene CSS an dieses Element oder sein Pseudo-Element gehängt hat, muss sie anpassen.
+
+    **3. `ribbons` liegt jetzt vor dem Inhalt.** Bisher galt das nur für `lines`, die Bänder lagen dahinter. Ein Messraster hinter dem, was man vermisst, taugt nicht.
+
+    Ausserdem entfallen die Sass-Variablen `$color--dev-grid`, `$color--dev-grid-ribbons` und `$color--dev-grid-center` aus `toolbar.scss`. Sie waren nie über `scss/forward` erreichbar, also nur relevant, wenn eine Projektdatei sie direkt importiert hat. Die Farben stehen jetzt als `GRID_MODES` in `Toolbar.js` — ein Canvas nimmt sie zur Laufzeit entgegen.
+
+    **Warum überhaupt:** Der Gradient erzeugte das Raster als Kachelmuster. Die Kachelbreite löst auf Bruchpixel auf, weshalb die `0.5px`-Farbstopps pro Kachel auf leicht verschiedenen physischen Pixeln landeten — beim Ziehen des Fensters wackelten die Linien sichtbar. `canvas-grid-lines` rechnet mit `devicePixelRatio` und setzt die Linien auf physische Pixel.
+
+### Added
+
+- **`dev/toolbar/gridColumns.js`** mit `gridColumnsTriple(config, layout)`. Rechnet die Spaltenkonfiguration eines Layouts in das Tripel `[total, band, gap]` um, das `canvas-grid-lines` als Wiederholungsmuster braucht.
+
+    Die Spaltenbreite wird dabei bewusst **nie ausgerechnet**: Sie ist oft kein ganzer Designpixel — in `template-kirbycms` etwa 91,428…. Stattdessen wird das Verhältnis `zaehler/count : gutter` mit `count` erweitert zu `zaehler : count · gutter`, also zu zwei ganzen Zahlen, und gekürzt. Das ist exakt und ohne Rundung. Gegengeprüft an allen Layouts von `template-craftcms`, `template-kirbycms` und `lequipe-visuelle.ch`: Die Kanten aus dem Tripel decken sich mit den Spaltenkanten in Designpixeln.
+
+### Changed
+
+- **Das Canvas entsteht erst beim ersten Einschalten** des Rasters. Ein Gradient kostet keinen Speicher, eine Bitmap in Viewportgrösse dagegen rund 23 MB auf einem Retina-Display. Solange die Auswahl auf `aus` steht, gibt es kein Canvas.
+
+    Aus demselben Grund wird das Overlay über `visibility` versteckt und nicht mehr über `display: none`: Ein Container ohne Ausdehnung schickt `canvas-grid-lines` auf seinen Lazy-Pfad, das Raster bliebe ungezeichnet.
+
+- **Neue Dependency `canvas-grid-lines`** (^10.3.0, keine transitiven Abhängigkeiten, ~3,4 kB gzip). Die Dev-Toolbar erreicht die Produktion nicht, weil sie in den Vorlagen hinter `{% if craft.app.env != 'production' %}` registriert wird.
+
+### Removed
+
+- **`dev/toolbar/COLUMNS.md`.** Der Plan darin beschrieb ein handgeschriebenes Canvas für denselben Zweck. Er ist mit dieser Änderung erledigt — und war ohnehin gegen einen veralteten Stand geschrieben, er referenziert ein `body[data-dev='true']`, das es in `Toolbar.js` nicht mehr gibt.
+
 ## [5.8.0] – 2026-08-18
 
 ### Added

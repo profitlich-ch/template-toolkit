@@ -15,6 +15,6 @@ export function initDev(config = {}, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new Toolbar(_options);
+    new Toolbar(_options, _config);
     console.info('Dev initialized.');
 });

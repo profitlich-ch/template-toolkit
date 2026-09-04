@@ -7,69 +7,43 @@
 }
 
 // grid
-$color--dev-grid: rgba(0, 0, 255, 0.5);
-$color--dev-grid-ribbons: rgba(191, 255, 254, 0.5);
-$color--dev-grid-center: rgba(0, 0, 0, 0.2);
-
-@mixin dev-toolbar-grid($layout, $columns, $gutter, $margin-left, $margin-right) {
-
-    $gutter: size($layout, $gutter);
-    $margin-left: size($layout, $margin-left);
-    $margin-right: size($layout, $margin-right);
-
-    .dev-toolbar__grid::after {
-        // the grid is made through repition
-        // 'important' because background settings are more specific than the grid settings
-        background-size: calc((100% - ($columns * $gutter)) * calc(1 / $columns) + $gutter) 1px !important;
-        margin: 0 calc($margin-right - calc($gutter / 2)) 0 calc($margin-left - calc($gutter / 2));
-        // The grid is calculated starting from the middle
-        // Thats why its necessary to add the half of the column gap to the left and right side
-        width: calc(100% - $margin-right + calc($gutter / 2) - $margin-left + calc($gutter / 2));
-    }
-
-    body[data-dev-grid="lines"] {
-        .dev-toolbar__grid::after {
-            background:
-                // center of the column spacing
-                linear-gradient(90deg, transparent 0.5px, transparent 0.5px) 0 0,
-                // Left column line
-                // position: from the column spacing center to the right by half a column spacing
-                linear-gradient(90deg, $color--dev-grid 0.5px, transparent 0.5px) calc($gutter / 2) 0,
-                // right column line
-                linear-gradient(90deg, $color--dev-grid 0.5px, transparent 0.5px) calc($gutter / 2 * -1) 0;
-        }
-    }
-
-    body[data-dev-grid="ribbons"] {
-        .dev-toolbar__grid::after {
-            background:
-                // ceft column ribbon
-                // position: from the column spacing center to the right by half a column spacing
-                linear-gradient(90deg, $color--dev-grid-ribbons calc(100% - $gutter), transparent 0.5px) calc($gutter / 2) 0,
-        }
-    }
-}
-
+//
+// Gezeichnet wird das Raster von `canvas-grid-lines`; Toolbar.js hängt das
+// Canvas in dieses Element. Hier steht nur noch, wo das Element liegt.
+// Die Linienfarben stehen als GRID_MODES in Toolbar.js — ein Canvas nimmt sie
+// zur Laufzeit entgegen, nicht als Sass-Variable.
 .dev-toolbar__grid {
-    display: none;
-    width: 100%;
+    // Spannt genau die Rasterbreite auf: Seitenränder aus `$margins`, Breite
+    // aus `left`/`right`. Die frühere Verschiebung um eine halbe Gutter-Breite
+    // entfällt — sie richtete nur die Kachelwiederholung des Gradienten aus.
     height: 100%;
-    left: 0;
     pointer-events: none;
     position: fixed;
     top: 0;
 
+    // Nicht `display: none`: Ein Container ohne Ausdehnung schickt
+    // canvas-grid-lines auf seinen Lazy-Pfad, das Raster bliebe ungezeichnet.
+    visibility: hidden;
+
+    // Immer vor dem Inhalt: Ein Messraster, das hinter dem liegt, was man
+    // vermessen will, taugt nicht — früher galt das nur für `lines`, `ribbons`
+    // lag dahinter. Der z-index macht zugleich den Stacking Context auf, ohne
+    // den das Canvas hinter den Hintergrund des Body rutschte.
+    //
+    // Gleicher Wert wie `.lil-gui.lil-root`, und das ist Absicht: Bei
+    // Gleichstand entscheidet die Dokumentreihenfolge, und die Toolbar hängt
+    // sich nach dem Overlay ein. Das Panel bleibt also bedienbar.
+    z-index: 9999999;
+
     body:not([data-dev-grid='aus']) & {
-        display: block;
+        visibility: visible;
     }
 
-    body[data-dev-grid='lines'] & {
-        z-index: 9999999;
-    }
-
-    &::after {
-        content: "";
-        height: 100%;
+    // Bewusst statt eines Imports von `canvas-grid-lines/css`: Dessen Regel
+    // greift über `[data-grid-initialised] canvas` auf jedes Canvas im Dokument
+    // und würde die Rasterebenen im Projekt mit `z-index: -1` nach hinten
+    // ziehen. Hier bleibt sie auf das Overlay beschränkt.
+    canvas {
         left: 0;
         position: absolute;
         top: 0;
@@ -78,7 +52,10 @@ $color--dev-grid-center: rgba(0, 0, 0, 0.2);
 
 @each $layout, $breite in $layouts {
     @include mediaquery($layout) using ($layout) {
-        @include dev-toolbar-grid($layout, map.get($columns, $layout), map.get($gutter, $layout), map.get(map.get($margins, $layout), 'left'), map.get(map.get($margins, $layout), 'right'));
+        .dev-toolbar__grid {
+            left: size($layout, map.get(map.get($margins, $layout), 'left'));
+            right: size($layout, map.get(map.get($margins, $layout), 'right'));
+        }
     }
 }
 

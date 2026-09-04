@@ -1,6 +1,21 @@
 import GUI from 'lil-gui';
+import { canvasGridLines } from 'canvas-grid-lines';
 import { MediaQueries } from '../../utils/MediaQueries.js';
+import { gridColumnsTriple } from './gridColumns.js';
 import './toolbar.scss';
+
+/**
+ * Übersetzt die Auswahl im Grid-Menü in die Rasterart von `canvas-grid-lines`.
+ * Die Namen der Auswahl bleiben, wie sie waren — sie stehen im gespeicherten
+ * State der Toolbar und wären sonst bei jedem ein Rückschritt auf `aus`.
+ *
+ * Die Farben standen früher als Sass-Variablen in `toolbar.scss`. Ein Canvas
+ * bekommt sie zur Laufzeit, deshalb stehen sie jetzt hier.
+ */
+const GRID_MODES = {
+    lines: { gridType: 'columns', color: 'rgba(0, 0, 255, 0.5)' },
+    ribbons: { gridType: 'ribbons', color: 'rgba(191, 255, 254, 0.5)' },
+};
 
 /**
  * Beschreibt eine projekteigene Checkbox in der Dev-Toolbar.
@@ -29,12 +44,18 @@ export class Toolbar {
     #pictureElements;
     #contentTypeContainer;
     #toggles;
+    #config;
+    #gridElement;
+    #grid = null;
 
     /**
      * @param {ToolbarOptions} [options={}] - Projekteigene Ergänzungen.
+     * @param {Object} [config={}] - Inhalt von `src/config.json` des Projekts.
+     *   Das Grid-Overlay leitet Spaltenzahl, Gutter und Seitenränder daraus ab.
      */
-    constructor(options = {}) {
+    constructor(options = {}, config = {}) {
         this.#toggles = options.toggles ?? [];
+        this.#config = config;
 
         // State aus localStorage laden
         const defaults = { visible: false, grid: 'aus', imageSize: false, sizes: false, contentType: false };
@@ -44,10 +65,12 @@ export class Toolbar {
         const saved = localStorage.getItem('devTools');
         this.#state = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
 
-        // Grid-Overlay DOM-Element erstellen
-        const gridOverlay = document.createElement('div');
-        gridOverlay.classList.add('dev-toolbar__grid');
-        document.body.prepend(gridOverlay);
+        // Grid-Overlay DOM-Element erstellen. Das Canvas darin entsteht erst
+        // beim ersten Einschalten — es ist eine Bitmap in Viewportgrösse, und
+        // die soll nicht zahlen, wer das Raster gar nicht anschaut.
+        this.#gridElement = document.createElement('div');
+        this.#gridElement.classList.add('dev-toolbar__grid');
+        document.body.prepend(this.#gridElement);
 
         // Content-Type-Label-Overlay erstellen
         this.#contentTypeContainer = document.createElement('div');
@@ -94,6 +117,7 @@ export class Toolbar {
 
         // Event-Listener
         window.addEventListener('resize', this.#onResize);
+        window.addEventListener('eventLayoutchange', this.#onLayoutChange);
         document.addEventListener('keydown', this.#handleKeyDown);
     }
 
@@ -109,10 +133,47 @@ export class Toolbar {
     #applyState() {
         document.body.setAttribute('data-dev-grid', this.#state.grid);
         document.body.setAttribute('data-dev-content-types', this.#state.contentType);
+        this.#updateGrid();
         this.#applyToggles();
         this.#updateImageSize();
         this.#updateSizes();
         this.#updateContentTypeLabels();
+    }
+
+    /**
+     * Baut das Raster beim ersten Einschalten und hält es danach auf dem Stand
+     * von Auswahl und Layout. Im Modus `aus` geschieht nichts — das Ausblenden
+     * erledigt allein `data-dev-grid` in der CSS.
+     */
+    #updateGrid() {
+        const mode = GRID_MODES[this.#state.grid];
+        if (!mode) return;
+
+        const columns = gridColumnsTriple(this.#config, this.#mediaQueries.layout);
+        if (!columns) return;
+
+        if (!this.#grid) {
+            [this.#grid] = canvasGridLines.initGrid({
+                targets: this.#gridElement,
+                gridType: mode.gridType,
+                columns,
+                color: mode.color,
+                lineWidth: 1,
+                units: 'devicepixel',
+            }) ?? [];
+            return;
+        }
+
+        // Reihenfolge: erst die Spalten, dann die Rasterart. Der gridType-Setter
+        // leitet sein Lückenmuster aus dem aktuellen columns-Wert ab, und der
+        // muss nach einem Breakpoint-Wechsel schon der neue sein.
+        this.#grid.columns = columns;
+        this.#grid.gridType = mode.gridType;
+        this.#grid.color = mode.color;
+    }
+
+    #onLayoutChange = () => {
+        this.#updateGrid();
     }
 
     #updateContentTypeLabels() {
