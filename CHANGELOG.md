@@ -8,6 +8,19 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **PostCSS-Plugin `vite/postcssBreakpointDry`** — warnt, wenn eine Deklaration mit gleichem Selektor und Wert in Media-Queries steht, die zusammen alle Breiten abdecken (typisch: dieselbe Zeile in smartphone, tablet und desktop), oder wenn sie in einer Media-Query nur die Grundregel wiederholt. Es prüft das kompilierte CSS, also mit aufgelöster Verschachtelung und ausgerechneten `$layout`-Werten, und bricht den Build nie ab. Dazu eine neue Regel unter *SCSS → Grundregel und Breakpoint-Blöcke* in `CLAUDE.project.md`. Einbinden in `postcss.config.js`:
+
+    ```diff
+    +import postcssBreakpointDry from '@profitlich/template-toolkit/vite/postcssBreakpointDry';
+    +
+     export default {
+    -    plugins: {},
+    +    plugins: [postcssBreakpointDry()],
+     };
+    ```
+
 ### Fixed
 
 - **Repository-URL auf den heutigen Pfad gezogen** — in `package.json` und in allen Compare-Links am Ende dieser Datei. Sie zeigten auf `profitlich-ch/profitlich-template-toolkit`; das Repo heisst seit einer Umbenennung `profitlich-ch/template-toolkit`. GitHub fing das mit einer 301-Weiterleitung auf, die Links funktionierten also — eine Weiterleitung ist aber nichts, worauf man sich dauerhaft stützt.

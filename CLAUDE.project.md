@@ -102,6 +102,22 @@ Ist ESLint eingerichtet, braucht `__DEBUG__` einen Eintrag unter `languageOption
 - Jedes Modul/Snippet hat eine eigene `.js`-Datei, die das zugehörige SCSS importiert — auch wenn sie sonst keine Logik enthält.
 - Keine globalen Styles in Modul- oder Snippet-SCSS-Dateien.
 
+#### Grundregel und Breakpoint-Blöcke
+
+**In einen `mediaquery()`-Block gehört nur, was sich pro Breakpoint unterscheidet** – in der Praxis fast nur Aufrufe mit `$layout`. Feste Werte wie `display: flex` oder `position: fixed` stehen einmal in der Grundregel oben in der Datei. Einen Breakpoint-Block nie als Kopie eines anderen anlegen: Genau so wandern feste Werte in alle drei Blöcke.
+
+Gleich *geschriebene* `$layout`-Aufrufe wie `font($layout, 14, 20)` sind keine Wiederholung – sie ergeben pro Breakpoint andere Werte und bleiben in den Blöcken.
+
+Das PostCSS-Plugin `@profitlich/template-toolkit/vite/postcssBreakpointDry` meldet beim Build und im Dev-Server, wo es trotzdem passiert ist: Deklarationen, die mit gleichem Selektor und Wert in Media-Queries stehen, die zusammen alle Breiten abdecken, und solche, die nur die Grundregel wiederholen. Es warnt nur. Eingebunden in `postcss.config.js`:
+
+```js
+import postcssBreakpointDry from '@profitlich/template-toolkit/vite/postcssBreakpointDry';
+
+export default {
+    plugins: [postcssBreakpointDry()],
+};
+```
+
 #### vw-Basis
 
 Per Default skalieren vw-basierte Werte mit der Viewport-Breite inkl. Scrollbar (`100vw`). Mit `"vwBasis": "body"` als Top-Level-Feld in `src/config.json` skalieren sie stattdessen mit der scrollbar-freien Body-Breite — sinnvoll, wenn Layout-Elemente in `%` gesetzt sind und Schriften/Abstände exakt mit diesen mitskalieren sollen. Dafür im Projekt `VwBody.getInstance()` (aus `@profitlich/template-toolkit/utils/VwBody`) aufrufen — setzt die Custom Property `--vw-body` per JS. Default-Verhalten ohne Feld unverändert.
@@ -141,6 +157,7 @@ Setup im Konsumenten:
 $cap: capsize-cap-height("soehne", 40);  // → font-spezifischer Wert
 padding-top: size($layout, 40 - $cap + 8);
 ```
+
 
 ### Vite Entry
 
