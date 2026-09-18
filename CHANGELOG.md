@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [6.1.0] – 2026-09-18
+
 ### Added
 
 - **PostCSS-Plugin `vite/postcssBreakpointDry`** — warnt, wenn eine Deklaration mit gleichem Selektor und Wert in Media-Queries steht, die zusammen alle Breiten abdecken (typisch: dieselbe Zeile in smartphone, tablet und desktop), oder wenn sie in einer Media-Query nur die Grundregel wiederholt. Es prüft das kompilierte CSS, also mit aufgelöster Verschachtelung und ausgerechneten `$layout`-Werten, und bricht den Build nie ab. Dazu eine neue Regel unter *SCSS → Grundregel und Breakpoint-Blöcke* in `CLAUDE.project.md`. Einbinden in `postcss.config.js`:
@@ -224,7 +226,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...HEAD
+[6.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.8.0...v6.0.0
 [5.8.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.7.0...v5.8.0
 [5.7.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.6.0...v5.7.0
