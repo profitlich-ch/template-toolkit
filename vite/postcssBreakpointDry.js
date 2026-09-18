@@ -59,11 +59,13 @@ export default function postcssBreakpointDry() {
 
                 const [selector, prop] = key.split('|');
                 const { value, decl } = entries[0];
+                // Pseudo-Elemente stammen meist aus font() mit Capsize-Font, behoben wird dort
+                const hint = /::?(before|after)\b/.test(selector) ? ' (bei Capsize: capsize() bzw. capsize-base in die Grundregel)' : '';
 
                 if (entries.every((entry) => entry.baseValue === value)) {
-                    decl.warn(result, `${location}${selector} { ${prop}: ${value} } wiederholt die Grundregel und kann aus den Media-Queries entfallen`);
+                    decl.warn(result, `${location}${selector} { ${prop}: ${value} } wiederholt die Grundregel und kann aus den Media-Queries entfallen${hint}`);
                 } else if (coversAllWidths(entries.map((entry) => entry.interval))) {
-                    decl.warn(result, `${location}${selector} { ${prop}: ${value} } steht in Media-Queries, die zusammen alle Breiten abdecken, und gehört in die Grundregel`);
+                    decl.warn(result, `${location}${selector} { ${prop}: ${value} } steht in Media-Queries, die zusammen alle Breiten abdecken, und gehört in die Grundregel${hint}`);
                 }
             }
         },

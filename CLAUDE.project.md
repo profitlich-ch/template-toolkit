@@ -158,6 +158,27 @@ $cap: capsize-cap-height("soehne", 40);  // → font-spezifischer Wert
 padding-top: size($layout, 40 - $cap + 8);
 ```
 
+**Capsize und Breakpoints**: Die Trims sind em-Werte und hängen nur von der Schrift und vom Verhältnis Zeilenhöhe/Schriftgrösse ab, nicht von `$layout`. Bekommt ein Selektor in allen Breakpoints Capsize, gehört der gleichbleibende Teil in die Grundregel. Zwei Fälle:
+
+- **Gleiches Verhältnis in allen Breakpoints** (z. B. überall 14/20): `capsize()` einmal in der Grundregel, in den Breakpoints `font()` ohne 4. Argument.
+
+    ```scss
+    .foo { @include capsize("soehne", 14, 20); }
+    @include mediaquery(tablet) using ($layout) {
+        .foo { @include font($layout, 14, 20); }
+    }
+    ```
+
+- **Verschiedene Verhältnisse** (z. B. 40/70, 56/120, 111/120): `capsize-base` in der Grundregel. Es schreibt `content` und `display` der Pseudo-Elemente einmal. `font()` mit Capsize-Font gibt danach für denselben Selektor nur noch die Trims aus. Die Verschachtelung muss in Grundregel und Breakpoint gleich sein, sonst greift die Zuordnung nicht, und es wird wie bisher alles ausgegeben.
+
+    ```scss
+    .foo { @include capsize-base; }
+    @include mediaquery(tablet) using ($layout) {
+        .foo { @include font($layout, 56, 120, "soehne"); }   // → nur Trims
+    }
+    ```
+
+Beides nur, wenn **jeder** Breakpoint Capsize bekommt. Sonst entstehen in den übrigen Pseudo-Elemente ohne Trims, die in einem Flex- oder Grid-Container als zusätzliche Items mitlaufen.
 
 ### Vite Entry
 

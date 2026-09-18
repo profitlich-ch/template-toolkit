@@ -21,6 +21,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
      };
     ```
 
+- **Mixin `capsize-base`** — schreibt den festen Teil der Capsize-Pseudo-Elemente (`content`, `display`) einmal in die Grundregel. `capsize()` und `font()` mit Capsize-Font geben danach für denselben Selektor nur noch die Trims aus. Gedacht für Selektoren, die in allen Breakpoints Capsize mit verschiedenem Verhältnis Zeilenhöhe/Schriftgrösse bekommen; bisher standen `content` und `display` dort in jedem Breakpoint. Welche Properties fest sind, ermittelt die neue Sass-Funktion `capsize-static-properties()` aus `@capsizecss/core`, nicht aus einer Liste im Toolkit. Ohne `capsize-base` bleibt die Ausgabe byte-gleich. Siehe *Capsize und Breakpoints* in `CLAUDE.project.md`.
+
 ### Fixed
 
 - **Repository-URL auf den heutigen Pfad gezogen** — in `package.json` und in allen Compare-Links am Ende dieser Datei. Sie zeigten auf `profitlich-ch/profitlich-template-toolkit`; das Repo heisst seit einer Umbenennung `profitlich-ch/template-toolkit`. GitHub fing das mit einer 301-Weiterleitung auf, die Links funktionierten also — eine Weiterleitung ist aber nichts, worauf man sich dauerhaft stützt.
