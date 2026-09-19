@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.0.0] – 2026-09-19
+
 ### Breaking Changes
 
 - **Mixin `capsize-base` und Sass-Funktion `capsize-static-properties()` entfernt.** Sie schrieben `content` und `display` der Capsize-Pseudo-Elemente einmal in die Grundregel, damit `postcssBreakpointDry` die Wiederholung in den Breakpoints nicht meldet. Der Gewinn waren rund 100 Byte CSS pro Selektor; dafür verhielt sich `font()` unsichtbar anders, je nachdem, ob weiter oben in der Datei `capsize-base` stand. Das Plugin übergeht diesen Fall jetzt selbst (siehe *Changed*). Migration – den Aufruf ersatzlos streichen:
@@ -241,7 +243,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...HEAD
+[7.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...v7.0.0
 [6.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.8.0...v6.0.0
 [5.8.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.7.0...v5.8.0
