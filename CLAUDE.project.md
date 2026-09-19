@@ -158,27 +158,18 @@ $cap: capsize-cap-height("soehne", 40);  // → font-spezifischer Wert
 padding-top: size($layout, 40 - $cap + 8);
 ```
 
-**Capsize und Breakpoints**: Die Trims sind em-Werte und hängen nur von der Schrift und vom Verhältnis Zeilenhöhe/Schriftgrösse ab, nicht von `$layout`. Bekommt ein Selektor in allen Breakpoints Capsize, gehört der gleichbleibende Teil in die Grundregel. Zwei Fälle:
+**Capsize und Breakpoints**: Die Trims sind em-Werte und hängen nur von der Schrift und vom Verhältnis Zeilenhöhe/Schriftgrösse ab, nicht von `$layout`. Ist das Verhältnis in **allen** Breakpoints gleich (z. B. überall 14/20), gehört `capsize()` einmal in die Grundregel, und in den Breakpoints steht `font()` ohne 4. Argument:
 
-- **Gleiches Verhältnis in allen Breakpoints** (z. B. überall 14/20): `capsize()` einmal in der Grundregel, in den Breakpoints `font()` ohne 4. Argument.
+```scss
+.foo { @include capsize("soehne", 14, 20); }
+@include mediaquery(tablet) using ($layout) {
+    .foo { @include font($layout, 14, 20); }
+}
+```
 
-    ```scss
-    .foo { @include capsize("soehne", 14, 20); }
-    @include mediaquery(tablet) using ($layout) {
-        .foo { @include font($layout, 14, 20); }
-    }
-    ```
+Sonst nur, wenn wirklich jeder Breakpoint Capsize bekommt – in den übrigen entstünden Pseudo-Elemente ohne Trims, die in einem Flex- oder Grid-Container als zusätzliche Items mitlaufen.
 
-- **Verschiedene Verhältnisse** (z. B. 40/70, 56/120, 111/120): `capsize-base` in der Grundregel. Es schreibt `content` und `display` der Pseudo-Elemente einmal. `font()` mit Capsize-Font gibt danach für denselben Selektor nur noch die Trims aus. Die Verschachtelung muss in Grundregel und Breakpoint gleich sein, sonst greift die Zuordnung nicht, und es wird wie bisher alles ausgegeben.
-
-    ```scss
-    .foo { @include capsize-base; }
-    @include mediaquery(tablet) using ($layout) {
-        .foo { @include font($layout, 56, 120, "soehne"); }   // → nur Trims
-    }
-    ```
-
-Beides nur, wenn **jeder** Breakpoint Capsize bekommt. Sonst entstehen in den übrigen Pseudo-Elemente ohne Trims, die in einem Flex- oder Grid-Container als zusätzliche Items mitlaufen.
+Bei verschiedenen Verhältnissen (z. B. 40/70, 56/120, 111/120) bleibt `font(…, "soehne")` in jedem Breakpoint. `content` und `display` der Pseudo-Elemente stehen dann in jedem Breakpoint erneut; `postcssBreakpointDry` übergeht sie in diesem Fall, weil sich das Pseudo-Element nur als Ganzes verschieben liesse.
 
 ### Vite Entry
 

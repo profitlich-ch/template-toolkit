@@ -8,6 +8,21 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **Mixin `capsize-base` und Sass-Funktion `capsize-static-properties()` entfernt.** Sie schrieben `content` und `display` der Capsize-Pseudo-Elemente einmal in die Grundregel, damit `postcssBreakpointDry` die Wiederholung in den Breakpoints nicht meldet. Der Gewinn waren rund 100 Byte CSS pro Selektor; dafür verhielt sich `font()` unsichtbar anders, je nachdem, ob weiter oben in der Datei `capsize-base` stand. Das Plugin übergeht diesen Fall jetzt selbst (siehe *Changed*). Migration – den Aufruf ersatzlos streichen:
+
+    ```diff
+     .foo {
+    -    @include capsize-base;
+     }
+    ```
+
+### Changed
+
+- **`postcssBreakpointDry` übergeht `content` und `display` an `::before`/`::after`**, wenn sich andere Eigenschaften desselben Pseudo-Elements pro Breakpoint unterscheiden – das Muster von Capsize mit verschiedenem Verhältnis Zeilenhöhe/Schriftgrösse. Das Pseudo-Element liesse sich nur als Ganzes verschieben, die Meldung war im Modul nicht behebbar. Sind auch die Trims überall gleich, meldet das Plugin weiterhin: Dann gehört `capsize()` in die Grundregel.
+- **`marginPadding()` gibt `0` als `0` aus** statt als `calc(var(--vw-body, 1vw) * 0)`, `0vw` oder `0px`. `size()` bleibt unverändert, weil `columns()` dessen Ergebnis in `calc()` mit `%` verrechnet, wo eine einheitenlose `0` ungültig wäre. Nebenbei hängen px-Layouts an Nicht-Zahlen wie `auto` kein `px` mehr an.
+
 ## [6.1.0] – 2026-09-18
 
 ### Added

@@ -1,19 +1,10 @@
-@use "sass:map";
 @use "sass:meta";
-
-// Selektoren, deren fester Capsize-Teil per capsize-base bereits in der
-// Grundregel steht. Jede SCSS-Datei ist eine eigene Sass-Kompilation, die Map
-// gilt also nur innerhalb einer Datei.
-$_base-selectors: ();
 
 // Emittiert die Capsize-Pseudo-Elemente (::before/::after mit Em-Trims)
 // für den aktuellen Selektor. Die Inhalte (welche Pseudo-Elemente, welche
 // Properties) kommen vollständig aus @capsizecss/core via der
 // Sass-Custom-Function capsize-pseudo-elements (registriert im
 // vite/capsizeSassFunctions.js des Toolkits).
-//
-// Steht für den Selektor capsize-base in der Grundregel, entfallen hier die
-// festen Properties, und es bleiben nur die Trims.
 @mixin capsize($name, $fontSize, $lineHeight) {
     // Capsize ist opt-in: ohne registrierte Custom-Function wird übersprungen,
     // damit ein fehlender Vite-Setup nicht zu kryptischem Sass-Fehler führt.
@@ -21,45 +12,12 @@ $_base-selectors: ();
         @warn "Capsize ist nicht eingerichtet: Custom-Function capsize-pseudo-elements fehlt. Siehe template-toolkit/CLAUDE.md, Abschnitt Capsize. Aufruf für \"#{$name}\" wird übersprungen.";
     } @else {
         $pseudo: capsize-pseudo-elements($name, $fontSize, $lineHeight);
-        $static: ();
-        @if map.has-key($_base-selectors, "#{&}") {
-            $static: capsize-static-properties();
-        }
-
         @each $selector-suffix, $props in $pseudo {
-            $skip: ();
-            @if map.has-key($static, $selector-suffix) {
-                $skip: map.get($static, $selector-suffix);
-            }
-
-            &#{$selector-suffix} {
-                @each $prop, $val in $props {
-                    @if not map.has-key($skip, $prop) {
-                        #{$prop}: $val;
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Emittiert den festen Teil der Capsize-Pseudo-Elemente (content, display)
-// einmal in der Grundregel. Die Aufrufe von capsize() bzw. font() mit
-// Capsize-Font in den Breakpoint-Blöcken geben danach nur noch die Trims aus.
-//
-// Nur verwenden, wenn der Selektor in allen Breakpoints Capsize bekommt –
-// sonst entstehen dort Pseudo-Elemente ohne Trims.
-@mixin capsize-base {
-    @if not meta.function-exists("capsize-static-properties") {
-        @warn "Capsize ist nicht eingerichtet: Custom-Function capsize-static-properties fehlt. Siehe template-toolkit/CLAUDE.md, Abschnitt Capsize. capsize-base wird übersprungen.";
-    } @else {
-        @each $selector-suffix, $props in capsize-static-properties() {
             &#{$selector-suffix} {
                 @each $prop, $val in $props {
                     #{$prop}: $val;
                 }
             }
         }
-        $_base-selectors: map.set($_base-selectors, "#{&}", true) !global;
     }
 }

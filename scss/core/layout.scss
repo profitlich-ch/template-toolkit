@@ -217,6 +217,15 @@ $mediaqueries: (
 }
 
 
+// 0 bleibt 0 statt calc(var(--vw-body, 1vw) * 0) oder 0vw. Nicht in size(),
+// weil columns() dessen Ergebnis in calc() mit % verrechnet, wo 0 ohne Einheit ungültig ist.
+@function _marginPadding-value($layout, $value) {
+    @if meta.type-of($value) != 'number' or $value == 0 {
+        @return $value;
+    }
+    @return size($layout, $value);
+}
+
 // Distance
 @mixin marginPadding($layout, $mode, $position, $top: 0, $right: 0, $bottom: 0, $left: 0, $important: null) {
 
@@ -224,26 +233,10 @@ $mediaqueries: (
         $important: '!important';
     }
 
-    @if ( map.get(config.$units, $layout) == 'px' ) {
-        $top: $top + px;
-        $right: $right + px;
-        $bottom: $bottom + px;
-        $left: $left + px;
-    } @else {
-
-        @if meta.type-of($top) == 'number'{
-            $top: size($layout, $top);
-        }
-        @if meta.type-of($right) == 'number'{
-            $right: size($layout, $right);
-        }
-        @if meta.type-of($bottom) == 'number'{
-            $bottom: size($layout, $bottom);
-        }
-        @if meta.type-of($left) == 'number'{
-            $left: size($layout, $left);
-        }
-    }
+    $top: _marginPadding-value($layout, $top);
+    $right: _marginPadding-value($layout, $right);
+    $bottom: _marginPadding-value($layout, $bottom);
+    $left: _marginPadding-value($layout, $left);
 
     @if $position == all {
         #{$mode}: $top $right $bottom $left #{$important};

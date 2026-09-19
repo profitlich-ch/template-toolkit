@@ -51,6 +51,12 @@ export default function postcssBreakpointDry() {
                 });
             });
 
+            // Selektoren, bei denen mindestens eine Eigenschaft je Media-Query anders ausfällt
+            const varying = new Set();
+            for (const [key, entries] of media) {
+                if (new Set(entries.map((entry) => entry.value)).size > 1) varying.add(key.split('|')[0]);
+            }
+
             for (const [key, entries] of media) {
                 // Setzt eine andere Media-Query denselben Selektor anders, hängt das
                 // Ergebnis an der Reihenfolge – kein eindeutiger Fall
@@ -59,8 +65,16 @@ export default function postcssBreakpointDry() {
 
                 const [selector, prop] = key.split('|');
                 const { value, decl } = entries[0];
+                const pseudo = /::?(before|after)\b/.test(selector);
+
+                // Capsize mit verschiedenem Verhältnis Zeilenhöhe/Schriftgrösse: Die Trims
+                // unterscheiden sich pro Breakpoint, content und display nicht. Das
+                // Pseudo-Element lässt sich nur als Ganzes verschieben, die Meldung wäre
+                // im Modul nicht behebbar.
+                if (pseudo && (prop === 'content' || prop === 'display') && varying.has(selector)) continue;
+
                 // Pseudo-Elemente stammen meist aus font() mit Capsize-Font, behoben wird dort
-                const hint = /::?(before|after)\b/.test(selector) ? ' (bei Capsize: capsize() bzw. capsize-base in die Grundregel)' : '';
+                const hint = pseudo ? ' (bei Capsize: capsize() in die Grundregel)' : '';
 
                 if (entries.every((entry) => entry.baseValue === value)) {
                     decl.warn(result, `${location}${selector} { ${prop}: ${value} } wiederholt die Grundregel und kann aus den Media-Queries entfallen${hint}`);

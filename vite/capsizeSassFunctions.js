@@ -60,33 +60,6 @@ export async function createCapsizeFunctions(fontFiles) {
             return new sass.SassMap(OrderedMap(entries));
         },
 
-        // Liefert pro Pseudo-Element die Properties, die nicht von Schriftgrösse
-        // und Zeilenhöhe abhängen (heute content und display). Ermittelt aus zwei
-        // Aufrufen mit verschiedenem Verhältnis: Was in beiden gleich bleibt, ist
-        // fest. So bestimmt Capsize das Schema, nicht eine Liste im Toolkit.
-        'capsize-static-properties()': () => {
-            const fontMetrics = Object.values(metrics)[0];
-            if (!fontMetrics) {
-                throw new Error('capsize-static-properties: Keine Font-Metriken geladen.');
-            }
-
-            const narrow = createStyleObject({ fontSize: 10, leading: 12, fontMetrics });
-            const wide = createStyleObject({ fontSize: 10, leading: 30, fontMetrics });
-
-            const entries = [];
-            for (const [key, val] of Object.entries(narrow)) {
-                if (!key.startsWith('::')) continue;
-                const fixed = Object.fromEntries(
-                    Object.entries(val).filter(([prop, value]) => wide[key]?.[prop] === value)
-                );
-                entries.push([
-                    new sass.SassString(key, { quotes: false }),
-                    _objToSassMap(fixed),
-                ]);
-            }
-            return new sass.SassMap(OrderedMap(entries));
-        },
-
         'capsize-cap-height($name, $fontSize)': (args) => {
             const name = args[0].assertString('name').text;
             const fontSize = args[1].assertNumber('fontSize').value;
