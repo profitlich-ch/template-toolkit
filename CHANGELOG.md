@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.1.0] – 2026-09-22
+
 ### Added
 
 - **`MuxPlayer`: Freigabe per `data-autoplay-enabled`.** Ein Autoplay-Video spielt nur noch, solange es im Viewport ist **und** das Attribut nicht auf `"false"` steht. So kann ein Skript mitentscheiden, ob ein Video läuft – etwa erst ab einer bestimmten Grösse –, während Stummschaltung, ausgeblendete Controls und die Pause ausserhalb des Viewports beim Toolkit bleiben. Das Attribut steht am `.mux-player`-Container, wird beim Lazy-Load auf den `<mux-player>` übertragen, und eine Änderung am Player wirkt sofort (per `MutationObserver`, kein Event nötig). Ohne Attribut verhält sich alles wie bisher.
@@ -251,7 +253,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...HEAD
+[7.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...v7.0.0
 [6.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v5.8.0...v6.0.0
