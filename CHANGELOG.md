@@ -8,6 +8,14 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **`MuxPlayer`: Freigabe per `data-autoplay-enabled`.** Ein Autoplay-Video spielt nur noch, solange es im Viewport ist **und** das Attribut nicht auf `"false"` steht. So kann ein Skript mitentscheiden, ob ein Video läuft – etwa erst ab einer bestimmten Grösse –, während Stummschaltung, ausgeblendete Controls und die Pause ausserhalb des Viewports beim Toolkit bleiben. Das Attribut steht am `.mux-player`-Container, wird beim Lazy-Load auf den `<mux-player>` übertragen, und eine Änderung am Player wirkt sofort (per `MutationObserver`, kein Event nötig). Ohne Attribut verhält sich alles wie bisher.
+
+    ```twig
+    <div class="mux-player" data-playback-id="…" data-autoplay="true" data-autoplay-enabled="false"></div>
+    ```
+
 ## [7.0.0] – 2026-09-19
 
 ### Breaking Changes

@@ -29,10 +29,20 @@ import './mux-player.scss';
  * Pausierlogik:
  * - Viewport verlassen → #handlePlayPause via IntersectionObserver (nur Autoplay)
  * - display:none gesetzt → handleVisibilityChange (manuell vom Projekt aufzurufen)
+ *
+ * Freigabe (nur Autoplay): Ein Autoplay-Video spielt, solange es im Viewport
+ * ist und `data-autoplay-enabled` nicht auf `"false"` steht. Das Attribut ist
+ * optional, ohne gilt das Video als freigegeben. Es steht am `.mux-player`-
+ * Container und wird beim Lazy-Load auf den Player übertragen; ein Skript, das
+ * über das Abspielen mitentscheidet, schaltet es am jeweils vorhandenen
+ * Element um. Eine Änderung am Player wirkt sofort.
  */
 export class MuxPlayer {
     #lazyLoadObserver;
     #playPauseObserver;
+    #enabledObserver;
+    /** @type {WeakSet<HTMLElement>} Autoplay-Player, die gerade im Viewport sind. */
+    #imViewport = new WeakSet();
     #loop;
     #noLowRes;
     #onPlayerCreated;
@@ -59,6 +69,9 @@ export class MuxPlayer {
         this.#metadata = metadata;
         this.#lazyLoadObserver = new IntersectionObserver(this.#handleLazyLoad.bind(this));
         this.#playPauseObserver = new IntersectionObserver(this.#handlePlayPause.bind(this));
+        this.#enabledObserver = new MutationObserver(records => {
+            records.forEach(record => this.#updatePlayback(record.target));
+        });
     }
 
     observeLazyElements() {
@@ -88,6 +101,10 @@ export class MuxPlayer {
             // direkt mit dem aktuellen Status — play() darf vor loadeddata aufgerufen
             // werden, der Browser kümmert sich ums Buffering.
             this.#playPauseObserver.observe(player);
+            this.#enabledObserver.observe(player, {
+                attributes: true,
+                attributeFilter: ['data-autoplay-enabled'],
+            });
         }
     }
 
@@ -100,6 +117,7 @@ export class MuxPlayer {
             this.#setup(player);
         } else if (!isVisible) {
             this.#playPauseObserver.unobserve(player);
+            this.#imViewport.delete(player);
             player.pause();
         }
     }
@@ -150,6 +168,12 @@ export class MuxPlayer {
                     player.setAttribute('data-autoplay', 'false');
                 }
 
+                // Der aktuelle Wert, nicht der aus dem HTML: Ein Skript kann
+                // ihn am Container schon vor dem Lazy-Load umgeschaltet haben.
+                if (container.dataset.autoplayEnabled !== undefined) {
+                    player.setAttribute('data-autoplay-enabled', container.dataset.autoplayEnabled);
+                }
+
                 if (this.#disableTracking) {
                     player.setAttribute('disable-tracking', '');
                 } else if (this.#envKey) {
@@ -189,10 +213,21 @@ export class MuxPlayer {
         for (const entry of entries) {
             const player = entry.target;
             if (entry.isIntersecting) {
-                player.play().catch(e => console.error("Player-Fehler:", e));
+                this.#imViewport.add(player);
             } else {
-                player.pause();
+                this.#imViewport.delete(player);
             }
+            this.#updatePlayback(player);
+        }
+    }
+
+    /** Spielt, wenn der Player im Viewport und freigegeben ist, sonst Pause. */
+    #updatePlayback(player) {
+        const enabled = player.dataset.autoplayEnabled !== 'false';
+        if (this.#imViewport.has(player) && enabled) {
+            if (player.paused) player.play().catch(e => console.error("Player-Fehler:", e));
+        } else if (!player.paused) {
+            player.pause();
         }
     }
 }
