@@ -8,6 +8,23 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **`scripts/pagespeed`: PageSpeed-Messung auf Abruf.** Misst die Seiten einer Umgebung über die PageSpeed-Insights-API, drei Läufe pro Seite mit Median, und zeigt Performance, Accessibility, Best Practices, SEO, die fünf Kennzahlen und die drei grössten Einsparpotenziale – mit Differenz zum letzten Lauf. Unter der Schwelle: Warnung und Exit-Code 1. Einbindung im Projekt:
+
+    ```js
+    // scripts/pagespeed.js
+    import { run } from '@profitlich/template-toolkit/scripts/pagespeed';
+    run([{ name: 'Startseite', path: '/' }], { thresholds: { mobile: 85, desktop: 95 } });
+    ```
+
+    ```json
+    "pagespeed": "node scripts/pagespeed.js"
+    ```
+
+    Dazu `PAGESPEED_API_KEY`, `PAGESPEED_URL_STAGING`, `PAGESPEED_URL_PRODUCTION` in der `.env` und `.pagespeed/` in der `.gitignore`. Aufruf: `ddev npm run pagespeed -- production`.
+- **Konventionen: Abschnitt „Performance messen"** in `CLAUDE.project.md` – API-Skript für den Stand, Lighthouse-CLI auf dem Host für die Ursachensuche.
+
 ## [7.2.0] – 2026-10-01
 
 ### Changed

@@ -186,3 +186,13 @@ Den Body **nie** bis `DOMContentLoaded` per `visibility: hidden` verstecken, auc
 Was bleibt: `body[data-preloading="true"]` gegen Transitions beim Laden und das Firefox-`<script>0</script>`.
 
 Grosse Bibliotheken, die nur ein Teil der Seiten braucht, per dynamischem `import()` laden, nicht statisch – wie `MuxPlayer` mit `@mux/mux-player`.
+
+### Performance messen
+
+Zwei Wege, je nach Frage:
+
+**Wie steht die Seite?** → `ddev npm run pagespeed -- production` (oder `staging`, optional `--desktop`, `--runs=5`). Misst über die PageSpeed-Insights-API, also auf Googles Servern mit derselben Drosselung wie pagespeed.web.dev – die Zahlen sind mit dem vergleichbar, was Kunden selbst nachschlagen. Pro Seite drei Läufe, gewertet wird der Median; einzelne Läufe schwanken um mehrere Punkte. Jeder Lauf landet unter `.pagespeed/` (gitignoriert), der nächste zeigt die Differenz dazu. Vor und nach einer Weiterentwicklung gegen Produktion messen. Welche Seiten, steht in `scripts/pagespeed.js` des Projekts: je eine pro Template mit schwerem Inhalt. Braucht `PAGESPEED_API_KEY` und `PAGESPEED_URL_<UMGEBUNG>` in der `.env`.
+
+**Warum ist sie langsam?** → Lighthouse-CLI auf dem Host gegen Staging oder Produktion, für Trace, Filmstreifen und Netzwerkbaum: `lighthouse <url> --form-factor=mobile --output=html --output-path=./bericht.html --view`. Global installiert (`npm install -g lighthouse`), nie ins Projekt – im Container fehlt Chrome, und die Colima-VM ist mit Builds schon ausgelastet. Aus einem Scratch-Verzeichnis aufrufen, nicht aus dem Projekt.
+
+Nicht gegen ddev messen: Lokal liefert der Vite-Dev-Server unbündelte Module aus, die Zahlen hätten mit der Auslieferung nichts zu tun.

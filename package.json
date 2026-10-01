@@ -23,6 +23,7 @@
         "./utils/ImagesLoaded": "./utils/images-loaded/ImagesLoaded.js",
         "./scripts/copy-files": "./scripts/copy-files.js",
         "./scripts/deploy": "./scripts/deploy.js",
+        "./scripts/pagespeed": "./scripts/pagespeed.js",
         "./vite/jsonToScss": "./vite/jsonToScss.js",
         "./vite/capsizeSassFunctions": "./vite/capsizeSassFunctions.js",
         "./vite/postcssBreakpointDry": "./vite/postcssBreakpointDry.js"
