@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.2.0] – 2026-10-01
+
 ### Changed
 
 - **`MuxPlayer` lädt `@mux/mux-player` erst, wenn ein Container den Viewport betritt.** Bisher importierte die Klasse die Bibliothek statisch. Damit lagen rund 1 MB JavaScript (≈300 KB übertragen) auf jeder Seite im kritischen Pfad, auch auf Seiten ohne sichtbares Video, und `DOMContentLoaded` wartete auf ihre Ausführung. Jetzt holt sie ein dynamischer Import beim ersten sichtbaren Container, einmal pro Seite. Die API bleibt gleich. Ein eigener `import '@mux/mux-player'` im Projekt hebt den Effekt wieder auf und sollte entfernt werden:
@@ -264,7 +266,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.2.0...HEAD
+[7.2.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...v7.0.0
 [6.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.0.0...v6.1.0
