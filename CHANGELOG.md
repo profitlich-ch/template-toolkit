@@ -8,6 +8,17 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+
+- **`MuxPlayer` lädt `@mux/mux-player` erst, wenn ein Container den Viewport betritt.** Bisher importierte die Klasse die Bibliothek statisch. Damit lagen rund 1 MB JavaScript (≈300 KB übertragen) auf jeder Seite im kritischen Pfad, auch auf Seiten ohne sichtbares Video, und `DOMContentLoaded` wartete auf ihre Ausführung. Jetzt holt sie ein dynamischer Import beim ersten sichtbaren Container, einmal pro Seite. Die API bleibt gleich. Ein eigener `import '@mux/mux-player'` im Projekt hebt den Effekt wieder auf und sollte entfernt werden:
+
+    ```diff
+    -import '@mux/mux-player';
+     import { MuxPlayer } from '@profitlich/template-toolkit/components/mux-player/MuxPlayer';
+    ```
+
+- **Konventionen: kein Ausblenden des Body gegen FOUC.** Neuer Abschnitt in `CLAUDE.project.md`. `template-craftcms` und `template-kirbycms` verzichten auf `body { visibility: hidden }` bis `DOMContentLoaded`, weil das FCP und LCP an das langsamste Modul-Skript koppelt.
+
 ## [7.1.0] – 2026-09-22
 
 ### Added

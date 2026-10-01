@@ -1,4 +1,3 @@
-import '@mux/mux-player';
 import './mux-player.scss';
 
 /**
@@ -16,8 +15,10 @@ import './mux-player.scss';
  *
  * Ladereihenfolge:
  * 1. observeLazyElements() beobachtet alle .mux-player-Container.
- * 2. Betritt ein Container den Viewport, ersetzt #handleLazyLoad ihn durch
- *    ein <mux-player>-Element und ruft handleVisibilityChange auf.
+ * 2. Betritt ein Container den Viewport, lädt #handleLazyLoad die Bibliothek
+ *    `@mux/mux-player` (einmalig, per dynamischem Import), ersetzt den
+ *    Container durch ein <mux-player>-Element und ruft handleVisibilityChange
+ *    auf. Seiten ohne sichtbares Video laden die Bibliothek nie.
  * 3. handleVisibilityChange → #setup für alle sichtbaren Videos:
  *    - Autoplay: muted, Controls versteckt, #playPauseObserver startet
  *    - Kein Autoplay: keine Änderungen, User steuert Wiedergabe selbst
@@ -49,6 +50,8 @@ export class MuxPlayer {
     #disableTracking;
     #envKey;
     #metadata;
+    /** @type {Promise<unknown> | null} */
+    #library = null;
 
     /**
      * @param {MuxPlayerOptions} [options]
@@ -125,86 +128,105 @@ export class MuxPlayer {
     #handleLazyLoad(entries) {
         for (const entry of entries) {
             if (entry.isIntersecting) {
+                // Sofort, nicht erst nach dem Import: Sonst meldet der Observer
+                // denselben Container erneut, solange die Bibliothek lädt.
                 this.#lazyLoadObserver.unobserve(entry.target);
-                const container = entry.target;
-                const playbackId = container.dataset.playbackId;
-                const aspectRatio = container.dataset.aspectRatio || '16 / 9';
-                const autoplay = container.dataset.autoplay === "true";
-
-                const player = document.createElement('mux-player');
-                player.playbackId = playbackId;
-                player.streamType = 'on-demand';
-                player.style.aspectRatio = aspectRatio;
-                player.thumbnailTime = 0;
-                if (this.#noLowRes) {
-                    const cssWidth = container.getBoundingClientRect().width
-                        || container.parentElement?.getBoundingClientRect().width;
-                    const physicalWidth = cssWidth * window.devicePixelRatio;
-                    // aspectRatio funktioniert mit Zahl und mit Verhältnis (x/y)
-                    const arRatio = aspectRatio.includes('/')
-                        ? (([w, h]) => parseFloat(w) / parseFloat(h))(aspectRatio.split('/'))
-                        : parseFloat(aspectRatio);
-                    const physicalHeight = physicalWidth / arRatio;
-                    const tiers = [
-                        [270, '270p'], [360, '360p'], [480, '480p'], [540, '540p'],
-                        [720, '720p'], [1080, '1080p'], [1440, '1440p'], [2160, '2160p'],
-                    ];
-                    player.minResolution = (tiers.find(([px]) => physicalHeight <= px) ?? [, '2160p'])[1];
-                }
-
-                if (container.dataset.accentColor) {
-                    player.accentColor = container.dataset.accentColor;
-                }
-
-                if (container.dataset.poster === 'false') {
-                    player.setAttribute('poster', '');
-                } else if (container.dataset.poster) {
-                    player.poster = container.dataset.poster;
-                }
-
-                if (autoplay) {
-                    player.setAttribute('data-autoplay', 'true');
-                } else {
-                    player.setAttribute('data-autoplay', 'false');
-                }
-
-                // Der aktuelle Wert, nicht der aus dem HTML: Ein Skript kann
-                // ihn am Container schon vor dem Lazy-Load umgeschaltet haben.
-                if (container.dataset.autoplayEnabled !== undefined) {
-                    player.setAttribute('data-autoplay-enabled', container.dataset.autoplayEnabled);
-                }
-
-                if (this.#disableTracking) {
-                    player.setAttribute('disable-tracking', '');
-                } else if (this.#envKey) {
-                    player.setAttribute('env-key', this.#envKey);
-                    if (this.#metadata) {
-                        player.metadata = this.#metadata;
-                    }
-                }
-
-                const setStatus = value => player.setAttribute('data-status', value);
-
-                player.addEventListener('loadstart', () => setStatus('loadstart'));
-                player.addEventListener('playing', () => setStatus('playing'));
-                player.addEventListener('pause', () => setStatus('pause'));
-                player.addEventListener('ended', () => setStatus('ended'));
-
-                console.log(
-                    'Toolkit Video',
-                    'width:', container.getBoundingClientRect().width, 
-                    'height:', container.getBoundingClientRect().height,
-                    'aspectRatio:', aspectRatio
-                );
-
-                container.replaceWith(player);
-                setStatus('false');
-
-                this.handleVisibilityChange(player);
-                if (this.#onPlayerCreated) {
-                    this.#onPlayerCreated(player, container);
-                }
+                this.#loadLibrary()
+                    .then(() => this.#createPlayer(entry.target))
+                    .catch(e => console.error('Mux-Player konnte nicht geladen werden:', e));
             }
+        }
+    }
+
+    /**
+     * Die Bibliothek ist rund 1 MB gross. Statisch importiert, läge sie auf
+     * jeder Seite im kritischen Pfad, auch wenn kein Video sichtbar wird.
+     */
+    #loadLibrary() {
+        this.#library ??= import('@mux/mux-player');
+        return this.#library;
+    }
+
+    #createPlayer(container) {
+        // Erst nach dem Import: Eigenschaften, die vor der Definition des
+        // Custom Elements gesetzt werden, landen als Own-Properties auf dem
+        // Element und verdecken nach dem Upgrade die Setter des Players.
+        const playbackId = container.dataset.playbackId;
+        const aspectRatio = container.dataset.aspectRatio || '16 / 9';
+        const autoplay = container.dataset.autoplay === "true";
+
+        const player = document.createElement('mux-player');
+        player.playbackId = playbackId;
+        player.streamType = 'on-demand';
+        player.style.aspectRatio = aspectRatio;
+        player.thumbnailTime = 0;
+        if (this.#noLowRes) {
+            const cssWidth = container.getBoundingClientRect().width
+                || container.parentElement?.getBoundingClientRect().width;
+            const physicalWidth = cssWidth * window.devicePixelRatio;
+            // aspectRatio funktioniert mit Zahl und mit Verhältnis (x/y)
+            const arRatio = aspectRatio.includes('/')
+                ? (([w, h]) => parseFloat(w) / parseFloat(h))(aspectRatio.split('/'))
+                : parseFloat(aspectRatio);
+            const physicalHeight = physicalWidth / arRatio;
+            const tiers = [
+                [270, '270p'], [360, '360p'], [480, '480p'], [540, '540p'],
+                [720, '720p'], [1080, '1080p'], [1440, '1440p'], [2160, '2160p'],
+            ];
+            player.minResolution = (tiers.find(([px]) => physicalHeight <= px) ?? [, '2160p'])[1];
+        }
+
+        if (container.dataset.accentColor) {
+            player.accentColor = container.dataset.accentColor;
+        }
+
+        if (container.dataset.poster === 'false') {
+            player.setAttribute('poster', '');
+        } else if (container.dataset.poster) {
+            player.poster = container.dataset.poster;
+        }
+
+        if (autoplay) {
+            player.setAttribute('data-autoplay', 'true');
+        } else {
+            player.setAttribute('data-autoplay', 'false');
+        }
+
+        // Der aktuelle Wert, nicht der aus dem HTML: Ein Skript kann
+        // ihn am Container schon vor dem Lazy-Load umgeschaltet haben.
+        if (container.dataset.autoplayEnabled !== undefined) {
+            player.setAttribute('data-autoplay-enabled', container.dataset.autoplayEnabled);
+        }
+
+        if (this.#disableTracking) {
+            player.setAttribute('disable-tracking', '');
+        } else if (this.#envKey) {
+            player.setAttribute('env-key', this.#envKey);
+            if (this.#metadata) {
+                player.metadata = this.#metadata;
+            }
+        }
+
+        const setStatus = value => player.setAttribute('data-status', value);
+
+        player.addEventListener('loadstart', () => setStatus('loadstart'));
+        player.addEventListener('playing', () => setStatus('playing'));
+        player.addEventListener('pause', () => setStatus('pause'));
+        player.addEventListener('ended', () => setStatus('ended'));
+
+        console.log(
+            'Toolkit Video',
+            'width:', container.getBoundingClientRect().width, 
+            'height:', container.getBoundingClientRect().height,
+            'aspectRatio:', aspectRatio
+        );
+
+        container.replaceWith(player);
+        setStatus('false');
+
+        this.handleVisibilityChange(player);
+        if (this.#onPlayerCreated) {
+            this.#onPlayerCreated(player, container);
         }
     }
 

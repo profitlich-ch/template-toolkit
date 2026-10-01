@@ -178,3 +178,11 @@ Einen neuen Entry in `rollupOptions.input` eintragen **nur wenn** das Script per
 ### Bilder
 
 Kein `lazysizes`. Ausschliesslich natives `loading="lazy"`.
+
+### Kein Ausblenden gegen FOUC
+
+Den Body **nie** bis `DOMContentLoaded` per `visibility: hidden` verstecken, auch nicht nur in Dev. Der verbreitete Trick ist dasselbe Muster wie die Anti-Flicker-Snippets von A/B-Test-Tools: Solange der Body unsichtbar ist, gilt nichts als gemalt, und `DOMContentLoaded` wartet auf alle Modul-Skripte. FCP und LCP hängen damit am langsamsten Skript der Seite. Gegen FOUC schützt in Produktion schon das CSS, das im `<head>` blockiert. Dass der Vite-Dev-Server CSS per JS nachlädt und dort kurz flackert, wird in Kauf genommen.
+
+Was bleibt: `body[data-preloading="true"]` gegen Transitions beim Laden und das Firefox-`<script>0</script>`.
+
+Grosse Bibliotheken, die nur ein Teil der Seiten braucht, per dynamischem `import()` laden, nicht statisch – wie `MuxPlayer` mit `@mux/mux-player`.
