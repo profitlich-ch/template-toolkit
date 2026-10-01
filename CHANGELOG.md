@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.3.0] – 2026-10-01
+
 ### Added
 
 - **`scripts/pagespeed`: PageSpeed-Messung auf Abruf.** Misst die Seiten einer Umgebung über die PageSpeed-Insights-API, drei Läufe pro Seite mit Median, und zeigt Performance, Accessibility, Best Practices, SEO, die fünf Kennzahlen und die drei grössten Einsparpotenziale – mit Differenz zum letzten Lauf. Unter der Schwelle: Warnung und Exit-Code 1. Einbindung im Projekt:
@@ -283,7 +285,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.2.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.3.0...HEAD
+[7.3.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.2.0...v7.3.0
 [7.2.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/profitlich-ch/template-toolkit/compare/v6.1.0...v7.0.0
