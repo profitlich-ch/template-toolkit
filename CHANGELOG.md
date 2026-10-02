@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.4.0] – 2026-10-02
+
 ### Added
 
 - **`README.md`** mit dem Überblick für Menschen: was das Paket enthält, wie die Arbeitsregeln über `sync-conventions` in die Projekte kommen und wie man ein Projekt auf eine neue Version hebt. Bisher stand das nur verstreut in `CLAUDE.md`, im Changelog und in Code-Kommentaren. Wie Toolkit, Vorlagen und Projekte zusammenhängen, steht im Unternehmenshandbuch, auf das die README verweist.
@@ -304,7 +306,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.3.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.0...HEAD
+[7.4.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.3.0...v7.4.0
 [7.3.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.2.0...v7.3.0
 [7.2.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.0.0...v7.1.0
