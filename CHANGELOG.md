@@ -8,6 +8,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **`README.md`** mit dem Überblick für Menschen: wie Toolkit, Vorlagen und Projekte zusammenhängen, was das Paket enthält, wie die Arbeitsregeln über `sync-conventions` in die Projekte kommen und wie man ein Projekt auf eine neue Version hebt. Bisher stand das nur verstreut in `CLAUDE.md`, im Changelog und in Code-Kommentaren.
+
 ## [7.3.0] – 2026-10-01
 
 ### Added
