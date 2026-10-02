@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.4.1] – 2026-10-02
+
 ### Fixed
 
 - **`deploy`** endet bei einem gescheiterten Deployment mit Exit-Code 1 statt 0. Bisher meldete der Prozess Erfolg, sodass aufrufende Skripte oder eine CI den Fehler nicht bemerkten.
@@ -311,7 +313,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.1...HEAD
+[7.4.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.0...v7.4.1
 [7.4.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.3.0...v7.4.0
 [7.3.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.2.0...v7.3.0
 [7.2.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.1.0...v7.2.0
