@@ -46,7 +46,12 @@ export async function syncConventions(options = {}) {
     // eigenen Toolkit-Version. Stünde der Block schon in der Vorlage, läge
     // derselbe Text doppelt unter Versionskontrolle — als Schnappschuss, der wie
     // die Quelle aussieht, aber beim Ableiten ohnehin überschrieben wird.
-    if (vorlagenRepos.includes(path.basename(process.cwd()))) return false;
+    //
+    // Erkannt am ddev-Projektnamen: Im Container heisst das Arbeitsverzeichnis
+    // immer /var/www/html, der Verzeichnisname taugt dort nicht. Ohne ddev
+    // bleibt er der Ersatz.
+    const projekt = process.env.DDEV_PROJECT ?? path.basename(process.cwd());
+    if (vorlagenRepos.includes(projekt)) return false;
 
     const zielPfad = path.resolve(options.target ?? 'CLAUDE.md');
 

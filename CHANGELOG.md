@@ -12,6 +12,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 - **`README.md`** mit dem Überblick für Menschen: wie Toolkit, Vorlagen und Projekte zusammenhängen, was das Paket enthält, wie die Arbeitsregeln über `sync-conventions` in die Projekte kommen und wie man ein Projekt auf eine neue Version hebt. Bisher stand das nur verstreut in `CLAUDE.md`, im Changelog und in Code-Kommentaren.
 
+### Fixed
+
+- **`syncConventions()` lässt die Vorlagen auch unter ddev aus.** Die Ausnahme aus 5.5.1 erkannte die Vorlage am Namen des Arbeitsverzeichnisses. Im ddev-Container heisst das aber immer `/var/www/html`, und dort läuft `copy` laut Konvention – die Ausnahme griff also nie, jeder Build und jeder Start des Dev-Servers schrieb den vollen Block in die `CLAUDE.md` von `template-craftcms`. Massgeblich ist jetzt `DDEV_PROJECT`, der Verzeichnisname nur noch ohne ddev. Im Konsumenten ist nichts zu tun.
+
 ## [7.3.0] – 2026-10-01
 
 ### Added
