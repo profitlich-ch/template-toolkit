@@ -11,6 +11,7 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ### Fixed
 
 - **`deploy`** endet bei einem gescheiterten Deployment mit Exit-Code 1 statt 0. Bisher meldete der Prozess Erfolg, sodass aufrufende Skripte oder eine CI den Fehler nicht bemerkten.
+- **Abhängigkeiten aktualisiert**, darunter `basic-ftp` 6.2.1: Die bisherige Version 5 war von [GHSA-c475-qrg2-pj4r](https://github.com/advisories/GHSA-c475-qrg2-pj4r) betroffen (Denial of Service beim Parsen von Verzeichnislisten). Ebenfalls über eine Major-Version gehoben: `chokidar` 5, `dotenv` 18, `glob` 13. Die Skripte `copy`, `dev` und `deploy` sind unter Node 20.20 geprüft; `chokidar` 5 verlangt Node ab 20.19.
 
 ## [7.4.0] – 2026-10-02
 
