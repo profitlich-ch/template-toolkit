@@ -1,12 +1,12 @@
 ### Craft CMS
 
-**CSP Nonce:** Beim Einbinden eines Scripts immer den Nonce mitgeben, sonst blockt die Content-Security-Policy es:
+**Keine Content-Security-Policy, keine Nonces.** Sie biss sich mit zu vielem, und mit Blitz liefert die statische Seite bei jedem Aufruf dieselben Nonces aus. Skripte werden ohne Nonce registriert:
 
 ```twig
-{% do craft.vite.register("src/modules/module-name/Module.js", false, { 'nonce': csp('script-src') }) %}
+{% do craft.vite.register("src/modules/module-name/Module.js", false) %}
 ```
 
-Dasselbe gilt für per `view.registerCss()` eingebettetes CSS: `{ nonce: csp('style-src') }`.
+Die Sicherheits-Header (HSTS, `X-Content-Type-Options`, `X-Frame-Options`) setzt die `.htaccess` mit `Header always set`, nicht ein Plugin: Seiten, die Blitz statisch ausliefert, erreichen PHP nie. Prüfen per `GET` (`curl -s -D - -o /dev/null <url>`), nicht mit `curl -I` – ein `HEAD` läuft an Blitz vorbei durch PHP.
 
 **Project Config:** Feld- und Struktur-Änderungen können direkt in den YAML-Dateien unter `config/project/` gemacht werden, danach `ddev craft project-config/apply` (Kontrolle vorher mit `project-config/diff`). `allowAdminChanges` ist üblicherweise nur in der Dev-Umgebung aktiv, Änderungen über die Oberfläche gehen also ausschliesslich lokal.
 

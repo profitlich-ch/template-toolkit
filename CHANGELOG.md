@@ -10,7 +10,18 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ### Added
 
-- **`README.md`** mit dem Überblick für Menschen: wie Toolkit, Vorlagen und Projekte zusammenhängen, was das Paket enthält, wie die Arbeitsregeln über `sync-conventions` in die Projekte kommen und wie man ein Projekt auf eine neue Version hebt. Bisher stand das nur verstreut in `CLAUDE.md`, im Changelog und in Code-Kommentaren.
+- **`README.md`** mit dem Überblick für Menschen: was das Paket enthält, wie die Arbeitsregeln über `sync-conventions` in die Projekte kommen und wie man ein Projekt auf eine neue Version hebt. Bisher stand das nur verstreut in `CLAUDE.md`, im Changelog und in Code-Kommentaren. Wie Toolkit, Vorlagen und Projekte zusammenhängen, steht im Unternehmenshandbuch, auf das die README verweist.
+
+### Changed
+
+- **Konventionen Craft: keine Content-Security-Policy mehr.** Die Regel „CSP Nonce“ in `CLAUDE.craftcms.md` ist ersetzt. Skripte werden ohne Nonce registriert, die Sicherheits-Header kommen aus der `.htaccess`. `template-craftcms` hat das CSP-Plugin entfernt. Ein Projekt, das es ebenfalls entfernt, muss alle `csp()`-Aufrufe streichen, sonst bricht das Template an der fehlenden Twig-Funktion:
+
+    ```diff
+    -{% do craft.vite.register("src/App.js", false, { 'nonce': csp('script-src') }) %}
+    +{% do craft.vite.register("src/App.js", false) %}
+    -<script nonce="{{ csp('script-src') }}">
+    +<script>
+    ```
 
 ### Fixed
 
