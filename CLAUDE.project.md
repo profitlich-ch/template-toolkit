@@ -71,8 +71,8 @@ Debug-Code bleibt im Quelltext — man braucht ihn beim nächsten Mal wieder. Er
 
 Dafür zwei Hebel, je nach Fall:
 
-- **`console.*`** — entfernt Terser beim Produktions-Build über `drop_console: mode === 'production'` in der `vite.config.js`. Kein Zutun nötig.
-- **Alles andere** (Debug-Ausgaben ins DOM, Messungen, Overlays) — in `if (__DEBUG__) { … }` einschliessen. Vite ersetzt die Konstante zur Bauzeit per `define: { __DEBUG__: mode !== 'production' }`; daraus wird `if (false)`, und der Minifier wirft den Zweig weg.
+- **`console.*`** — entfernt Terser beim Produktions-Build (`drop_console: mode === 'production'` im Baustein `buildOptions`). Kein Zutun nötig.
+- **Alles andere** (Debug-Ausgaben ins DOM, Messungen, Overlays) — in `if (__DEBUG__) { … }` einschliessen. Vite ersetzt die Konstante zur Bauzeit (Baustein `defineDebug`: `__DEBUG__: mode !== 'production'`); daraus wird `if (false)`, und der Minifier wirft den Zweig weg.
 
 An `mode` hängen, **nicht** an `import.meta.env.DEV` — Letzteres ist auf Staging bereits `false` und würde den Debug-Code dort verschlucken.
 
@@ -93,7 +93,23 @@ Der Wert steht danach als `body[data-dev-navigate-space="true"]` bereit — für
 
 Der Schalter ersetzt nicht `__DEBUG__`, er ergänzt es: `__DEBUG__` entscheidet, ob der Code überhaupt ausgeliefert wird, der Schalter, ob man ihn gerade sehen will.
 
-Ist ESLint eingerichtet, braucht `__DEBUG__` einen Eintrag unter `languageOptions.globals`, sonst meldet `no-undef`.
+`eslintConfig()` aus `@profitlich/template-toolkit/eslint/config` kennt `__DEBUG__` bereits; eine eigene ESLint-Konfiguration braucht dafür einen Eintrag unter `languageOptions.globals`, sonst meldet `no-undef`.
+
+### Build-Konfiguration
+
+`vite.config.js`, `postcss.config.js` und `eslint.config.js` setzen sich aus **Bausteinen des Toolkits** und den Angaben des Projekts zusammen. Generisches – Minifizierung, Debug-Konstante, Dev-Server, SCSS-Einrichtung, PostCSS-Plugins, Lint-Regeln – kommt aus dem Toolkit und wird mit ihm aktualisiert. Im Projekt stehen nur Entries, Plugins, Pfade und Ignore-Listen.
+
+```js
+// vite.config.js (Auszug)
+import { defineDebug, buildOptions, serverOptions, scssOptions } from '@profitlich/template-toolkit/vite/config';
+
+define: defineDebug(mode),
+build: { ...buildOptions({ mode, outDir: './web/dist/' }), rollupOptions: { input: { app: 'src/App.js' } } },
+server: serverOptions({ env }),
+css: { preprocessorOptions: { scss: await scssOptions({ configJson }) } },
+```
+
+Einen generischen Wert nicht im Projekt umbauen, sondern im Toolkit ändern – sonst läuft das Projekt wieder auseinander. Weicht ein Projekt bewusst ab, den Wert direkt neben dem Baustein überschreiben und begründen.
 
 ### SCSS
 
@@ -108,13 +124,13 @@ Ist ESLint eingerichtet, braucht `__DEBUG__` einen Eintrag unter `languageOption
 
 Gleich *geschriebene* `$layout`-Aufrufe wie `font($layout, 14, 20)` sind keine Wiederholung – sie ergeben pro Breakpoint andere Werte und bleiben in den Blöcken.
 
-Das PostCSS-Plugin `@profitlich/template-toolkit/vite/postcssBreakpointDry` meldet beim Build und im Dev-Server, wo es trotzdem passiert ist: Deklarationen, die mit gleichem Selektor und Wert in Media-Queries stehen, die zusammen alle Breiten abdecken, und solche, die nur die Grundregel wiederholen. Es warnt nur. Eingebunden in `postcss.config.js`:
+Das PostCSS-Plugin `@profitlich/template-toolkit/vite/postcssBreakpointDry` meldet beim Build und im Dev-Server, wo es trotzdem passiert ist: Deklarationen, die mit gleichem Selektor und Wert in Media-Queries stehen, die zusammen alle Breiten abdecken, und solche, die nur die Grundregel wiederholen. Es warnt nur. Eingebunden ist es über die Toolkit-Plugins in `postcss.config.js`:
 
 ```js
-import postcssBreakpointDry from '@profitlich/template-toolkit/vite/postcssBreakpointDry';
+import { postcssPlugins } from '@profitlich/template-toolkit/vite/postcssPlugins';
 
 export default {
-    plugins: [postcssBreakpointDry()],
+    plugins: [...postcssPlugins()],
 };
 ```
 
@@ -132,14 +148,7 @@ Setup im Konsumenten:
 
 1. `@capsizecss/unpack` und `@capsizecss/core` als devDependency installieren.
 2. In `src/config.json` Top-Level-Feld `fonts` ergänzen: Map Name → Pfad zur Font-Datei.
-3. In `vite.config.js`:
-
-    ```js
-    import { createCapsizeFunctions } from '@profitlich/template-toolkit/vite/capsizeSassFunctions';
-    // defineConfig async:
-    const capsizeFunctions = await createCapsizeFunctions(configJson.fonts ?? {});
-    // dann: css.preprocessorOptions.scss.functions = capsizeFunctions;
-    ```
+3. Nichts weiter: Der Baustein `scssOptions` lädt die Capsize-Funktionen, sobald `fonts` Einträge hat.
 
 4. Pro `@include font(...)` als 4. Argument den Font-Namen aus `fonts` mitgeben — Trims werden emittiert. Ohne Argument: kein Capsize-Output (Default).
 

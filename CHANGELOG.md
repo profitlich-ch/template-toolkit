@@ -8,6 +8,33 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **Bausteine für die Build-Konfiguration.** Generisches aus `vite.config.js`, `postcss.config.js` und `eslint.config.js` kommt jetzt aus dem Toolkit; im Projekt bleiben Entries, Plugins, Pfade und Ignore-Listen.
+  - `…/vite/config`: `defineDebug(mode)`, `buildOptions({ mode, outDir })`, `serverOptions({ env, port })`, `scssOptions({ configJson, loadPaths })`. `scssOptions` lädt die Capsize-Funktionen nur, wenn `configJson.fonts` Einträge hat.
+  - `…/vite/postcssPlugins`: `postcssPlugins()` mit `postcss-input-range` und `postcssBreakpointDry`.
+  - `…/eslint/config`: `eslintConfig()` mit den Grundregeln für Browser-Code in `src/` und Node-Skripte.
+  - Neue optionale `peerDependencies`: `sass`, `postcss-input-range`, `@eslint/js`, `globals`.
+
+  Umstellung im Projekt, optional – die bisherigen Exporte bleiben:
+
+  ```diff
+  - import { jsonToScss } from '@profitlich/template-toolkit/vite/jsonToScss';
+  - import { createCapsizeFunctions } from '@profitlich/template-toolkit/vite/capsizeSassFunctions';
+  + import { defineDebug, buildOptions, serverOptions, scssOptions } from '@profitlich/template-toolkit/vite/config';
+    …
+  - define: { __DEBUG__: mode !== 'production' },
+  - build: { manifest: true, outDir: './web/dist/', … , rollupOptions: { input: { … } } },
+  - server: { host: '0.0.0.0', port: 5173, … },
+  - css: { preprocessorOptions: { scss: { api: 'modern', importers: [ … ], … } } },
+  + define: defineDebug(mode),
+  + build: { ...buildOptions({ mode, outDir: './web/dist/' }), rollupOptions: { input: { … } } },
+  + server: serverOptions({ env }),
+  + css: { preprocessorOptions: { scss: await scssOptions({ configJson }) } },
+  ```
+
+  Vollständige Beispiele: `vite.config.js`, `postcss.config.js` und `eslint.config.js` in `template-craftcms`.
+
 ## [7.4.1] – 2026-10-02
 
 ### Fixed

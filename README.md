@@ -12,7 +12,8 @@ Wie Toolkit, Vorlagen und Projekte zusammenhängen und was auf welche Ebene geh�
 | Utilities | `…/utils/<Name>` | `MediaQueries`, `VwBody`, `BodyScrolled`, `ImagesLoaded`, `MailAdresses` |
 | Komponenten | `…/components/…` | `MenuToggle`, `MuxPlayer` |
 | Dev-Toolbar | `…/dev` | `initDev(config, { toggles })`, Raster-Overlay |
-| Vite/PostCSS | `…/vite/<Name>` | `jsonToScss`, `capsizeSassFunctions`, `postcssBreakpointDry` |
+| Vite/PostCSS | `…/vite/<Name>` | Bausteine für `vite.config.js` (`…/vite/config`: `defineDebug`, `buildOptions`, `serverOptions`, `scssOptions`), `postcssPlugins`, `postcssBreakpointDry`, `jsonToScss`, `capsizeSassFunctions` |
+| ESLint | `…/eslint/config` | `eslintConfig()` – Grundkonfiguration, das Projekt stellt seine `ignores` voran |
 | Skripte | `…/scripts/<Name>` | `copy-files`, `deploy`, `pagespeed` |
 
 Die vollständige Liste steht unter `exports` in der `package.json`. Was jede Funktion tut, steht in ihrem JSDoc.

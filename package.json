@@ -26,7 +26,10 @@
         "./scripts/pagespeed": "./scripts/pagespeed.js",
         "./vite/jsonToScss": "./vite/jsonToScss.js",
         "./vite/capsizeSassFunctions": "./vite/capsizeSassFunctions.js",
-        "./vite/postcssBreakpointDry": "./vite/postcssBreakpointDry.js"
+        "./vite/postcssBreakpointDry": "./vite/postcssBreakpointDry.js",
+        "./vite/config": "./vite/config.js",
+        "./vite/postcssPlugins": "./vite/postcssPlugins.js",
+        "./eslint/config": "./eslint/config.js"
     },
     "files": [
         "CLAUDE.project.md",
@@ -34,6 +37,7 @@
         "CLAUDE.kirbycms.md",
         "components/",
         "dev/",
+        "eslint/",
         "scss/",
         "scripts/",
         "utils/",
@@ -52,9 +56,25 @@
     "peerDependencies": {
         "@capsizecss/core": ">=4.0.0",
         "@capsizecss/unpack": ">=4.0.0",
-        "@mux/mux-player": ">=3.0.0"
+        "@mux/mux-player": ">=3.0.0",
+        "@eslint/js": ">=9.0.0",
+        "globals": ">=15.0.0",
+        "postcss-input-range": ">=6.0.0",
+        "sass": ">=1.79.0"
     },
     "peerDependenciesMeta": {
+        "@eslint/js": {
+            "optional": true
+        },
+        "globals": {
+            "optional": true
+        },
+        "postcss-input-range": {
+            "optional": true
+        },
+        "sass": {
+            "optional": true
+        },
         "@capsizecss/core": {
             "optional": true
         },
