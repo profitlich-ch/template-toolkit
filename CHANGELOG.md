@@ -8,6 +8,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+
+- **`deploy`** endet bei einem gescheiterten Deployment mit Exit-Code 1 statt 0. Bisher meldete der Prozess Erfolg, sodass aufrufende Skripte oder eine CI den Fehler nicht bemerkten.
+
 ## [7.4.0] – 2026-10-02
 
 ### Added

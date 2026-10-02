@@ -212,6 +212,8 @@ export async function runDeploy(mode, uploadTasks, options = {}) {
             activeProgressBar.stop();
         }
         console.error('Deployment failed:', err);
+        // exitCode statt exit(), damit finally die Verbindung noch schliesst
+        process.exitCode = 1;
     } finally {
         mainClient.close();
     }
