@@ -11,6 +11,7 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ### Changed
 
 - **`CLAUDE.project.md`: Direkte `px`-Werte im SCSS sind erlaubt.** Die Regel «nie direkte `px`-, `vw`- oder `rem`-Werte» verlangte, jedes Mass durch `size()`, `font()` oder `marginPadding()` zu schicken. Das hielt die Möglichkeit offen, die Einheit eines Layouts nachträglich zu wechseln – was in Projekten nicht vorkommt. Jetzt gilt: Die Funktionen dort, wo ein Mass mit dem Layout mitgehen soll; feste Werte stehen direkt da. Rohes `vw` bleibt ausgeschlossen, weil es an `--vw-body` vorbei am Fenster misst. Konsumierende Projekte erhalten die neue Fassung beim nächsten `copy`-Lauf nach dem Versions-Bump; bestehender Code muss nicht angepasst werden.
+- **Abhängigkeiten angehoben:** `basic-ftp` 6.2.2, `dotenv` 18.0.6. Beides Patch-Versionen, an den Skripten ändert sich nichts.
 
 ## [7.5.0] – 2026-10-02
 
