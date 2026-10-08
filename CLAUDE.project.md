@@ -113,7 +113,8 @@ Einen generischen Wert nicht im Projekt umbauen, sondern im Toolkit ändern – 
 
 ### SCSS
 
-- Nie direkte `px`-, `vw`- oder `rem`-Werte — ausschliesslich Toolkit-Funktionen: `size()`, `columns()`, `font()`, `marginPadding()`.
+- **Toolkit-Funktionen dort, wo ein Mass mit dem Layout mitgehen soll:** `size()`, `columns()`, `font()`, `marginPadding()`. Sie rechnen ein Mass aus dem Entwurf in die Einheit des Layouts um. **Feste Werte stehen direkt da** – eine Haarlinie von `1px`, ein Radius von `999px`. Nicht alles vorsorglich durch die Funktionen schicken: Die Einheit eines Layouts wird in einem Projekt nachträglich nicht gewechselt, die Flexibilität dafür nutzt niemand.
+- **Kein rohes `vw`.** `size()` rechnet mit `--vw-body`, wenn `vwBasis` auf `body` steht; ein rohes `vw` misst am Fenster samt Scrollbar und läuft bei sichtbarer Scrollbar gegen das übrige Layout.
 - `src/config.json` ist die einzige Quelle für Breakpoints, Layouts, Farben — nie im Code hardcodieren.
 - Jedes Modul/Snippet hat eine eigene `.js`-Datei, die das zugehörige SCSS importiert — auch wenn sie sonst keine Logik enthält.
 - Keine globalen Styles in Modul- oder Snippet-SCSS-Dateien.
