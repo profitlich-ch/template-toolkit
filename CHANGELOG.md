@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.6.0] – 2026-10-08
+
 ### Changed
 
 - **`CLAUDE.project.md`: Direkte `px`-Werte im SCSS sind erlaubt.** Die Regel «nie direkte `px`-, `vw`- oder `rem`-Werte» verlangte, jedes Mass durch `size()`, `font()` oder `marginPadding()` zu schicken. Das hielt die Möglichkeit offen, die Einheit eines Layouts nachträglich zu wechseln – was in Projekten nicht vorkommt. Jetzt gilt: Die Funktionen dort, wo ein Mass mit dem Layout mitgehen soll; feste Werte stehen direkt da. Rohes `vw` bleibt ausgeschlossen, weil es an `--vw-body` vorbei am Fenster misst. Konsumierende Projekte erhalten die neue Fassung beim nächsten `copy`-Lauf nach dem Versions-Bump; bestehender Code muss nicht angepasst werden.
@@ -347,7 +349,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.5.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.0...HEAD
+[7.6.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.5.0...v7.6.0
 [7.5.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.1...v7.5.0
 [7.4.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.0...v7.4.1
 [7.4.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.3.0...v7.4.0
