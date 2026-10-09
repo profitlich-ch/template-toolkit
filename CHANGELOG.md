@@ -8,6 +8,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+
+- **Dev-Toolbar: Das Grid-Overlay zeigt bei `units: px` einen festen Gutter.** Das Raster wurde immer als Verhältnis von Spalte zu Gutter gezeichnet und wuchs damit als Ganzes mit dem Fenster. Für `vw`-Layouts stimmt das; in einem `px`-Layout bleibt der Gutter aber gleich breit, und nur die Spalten geben nach. Das Overlay deckte sich dort deshalb nur genau an der Layoutbreite mit der Seite – ein Gutter von 20 px war bei 1600 px Fensterbreite 25 px breit gezeichnet. Jetzt liest das Overlay `units` des aktiven Layouts: bei `px` zeichnet es den Gutter in fester Breite, bei `vw` wie bisher. Braucht `canvas-grid-lines` 10.6.0, das feste Abstände kennt; die Abhängigkeit ist entsprechend angehoben.
+
 ## [7.6.0] – 2026-10-08
 
 ### Changed

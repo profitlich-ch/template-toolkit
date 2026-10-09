@@ -1,7 +1,7 @@
 import GUI from 'lil-gui';
 import { canvasGridLines } from 'canvas-grid-lines';
 import { MediaQueries } from '../../utils/MediaQueries.js';
-import { gridColumnsTriple } from './gridColumns.js';
+import { gridColumnsOptions } from './gridColumns.js';
 import './toolbar.scss';
 
 /**
@@ -149,14 +149,14 @@ export class Toolbar {
         const mode = GRID_MODES[this.#state.grid];
         if (!mode) return;
 
-        const columns = gridColumnsTriple(this.#config, this.#mediaQueries.layout);
+        const columns = gridColumnsOptions(this.#config, this.#mediaQueries.layout);
         if (!columns) return;
 
         if (!this.#grid) {
             [this.#grid] = canvasGridLines.initGrid({
                 targets: this.#gridElement,
                 gridType: mode.gridType,
-                columns,
+                ...columns,
                 color: mode.color,
                 lineWidth: 1,
                 units: 'devicepixel',
@@ -164,12 +164,11 @@ export class Toolbar {
             return;
         }
 
-        // Reihenfolge: erst die Spalten, dann die Rasterart. Der gridType-Setter
-        // leitet sein Lückenmuster aus dem aktuellen columns-Wert ab, und der
-        // muss nach einem Breakpoint-Wechsel schon der neue sein.
-        this.#grid.columns = columns;
-        this.#grid.gridType = mode.gridType;
-        this.#grid.color = mode.color;
+        // In einem Schritt statt über einzelne Setter: Wechselt ein Breakpoint
+        // zwischen festem und mitwachsendem Gutter, hat `columns` eine andere
+        // Anzahl Werte, und jede Reihenfolge einzelner Zuweisungen liefe über
+        // einen ungültigen Zwischenstand.
+        this.#grid.configure({ ...columns, gridType: mode.gridType, color: mode.color });
     }
 
     #onLayoutChange = () => {
