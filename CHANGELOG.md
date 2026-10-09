@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.6.1] – 2026-10-09
+
 ### Fixed
 
 - **Dev-Toolbar: Das Grid-Overlay zeigt bei `units: px` einen festen Gutter.** Das Raster wurde immer als Verhältnis von Spalte zu Gutter gezeichnet und wuchs damit als Ganzes mit dem Fenster. Für `vw`-Layouts stimmt das; in einem `px`-Layout bleibt der Gutter aber gleich breit, und nur die Spalten geben nach. Das Overlay deckte sich dort deshalb nur genau an der Layoutbreite mit der Seite – ein Gutter von 20 px war bei 1600 px Fensterbreite 25 px breit gezeichnet. Jetzt liest das Overlay `units` des aktiven Layouts: bei `px` zeichnet es den Gutter in fester Breite, bei `vw` wie bisher. Braucht `canvas-grid-lines` 10.6.0, das feste Abstände kennt; die Abhängigkeit ist entsprechend angehoben.
@@ -353,7 +355,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.1...HEAD
+[7.6.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.0...v7.6.1
 [7.6.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.5.0...v7.6.0
 [7.5.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.1...v7.5.0
 [7.4.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.0...v7.4.1
