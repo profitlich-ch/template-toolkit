@@ -168,6 +168,8 @@ export class MenuToggle {
                 this.#fixElement.style.paddingRight = '';
             }
             this.#fixElement.style.top = '';
+            this.#fixElement.style.position = '';
+            this.#fixElement.style.width = '';
             window.scrollTo(0, this.#y);
         }
         this.#toggleEscape(false);
@@ -193,10 +195,18 @@ export class MenuToggle {
     // Scrollbar stehen – `overflow-y: scroll` oder `scrollbar-gutter: stable` an `html`,
     // oder ein anderes #fixElement als der Body –, ist das nichts; ein Ausgleich um die
     // volle Scrollbar-Breite schöbe den Inhalt dann nach links.
+    //
+    // `top` kommt vom Element selbst, nicht aus `scrollY`: Beginnt es nicht oben im
+    // Dokument – etwa `main` unter einem Header –, spränge es sonst um diesen Abstand.
+    // `position` und `width` stehen inline, weil eine Regel des Projekts am Element
+    // (`.main { position: relative }`) die gleich schwere Regel aus menu-toggle.scss
+    // sonst aussticht.
     #applyFix() {
         const widthBefore = document.documentElement.clientWidth;
         this.#y = window.scrollY;
-        this.#fixElement.style.top = `-${this.#y}px`;
+        this.#fixElement.style.top = `${this.#fixElement.getBoundingClientRect().top}px`;
+        this.#fixElement.style.position = 'fixed';
+        this.#fixElement.style.width = '100%';
         this.#fixElement.setAttribute('data-menu-fixed', 'true');
         this.#scrollbarWidth = Math.max(0, document.documentElement.clientWidth - widthBefore);
         if (this.#fixElementIsBody) {

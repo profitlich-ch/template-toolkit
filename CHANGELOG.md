@@ -8,6 +8,11 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Fixed
+
+- **`MenuToggle`: Ein fixiertes Element, das nicht oben im Dokument beginnt, springt nicht mehr.** Mit `fixElementSelector` lässt sich statt des Body etwa `main` fixieren; steht davor ein Header im Fluss, sprang `main` beim Öffnen um dessen Höhe nach oben, weil `top` aus `scrollY` berechnet wurde. Jetzt kommt `top` von `getBoundingClientRect()` des Elements. Für den Body ist das derselbe Wert wie bisher.
+- **`MenuToggle`: Das Fixieren setzt sich gegen Regeln des Projekts durch.** `position: fixed` stand nur in `menu-toggle.scss`, in einer Regel mit dem Gewicht einer Klasse. Eine Regel des Projekts am selben Element – `.main { position: relative }` – stach sie aus, wenn sie später geladen wurde, und das Element blieb im Fluss. `position` und `width` setzt `MenuToggle` jetzt inline; `data-menu-fixed` bleibt für das CSS des Projekts bestehen.
+
 ## [7.7.0] – 2026-10-14
 
 ### Added
