@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.7.0] – 2026-10-14
+
 ### Added
 
 - **`MenuToggle`: öffentliche Methoden `open()` und `close()`.** Bisher liess sich das Menü nur über den einen Menü-Button öffnen. Ein Menü mit mehreren Knöpfen – etwa Hauptmenüpunkte, die je ihre Spalten aufklappen – konnte das Fixieren des Body, den Scrollbar-Ausgleich und das Zurückspringen an die alte Scroll-Position deshalb nicht mitbenutzen. Beide Methoden tun nichts, wenn das Menü schon im gewünschten Zustand ist, und melden sonst wie bisher `eventMenuestatus`.
@@ -364,7 +366,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.1...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.7.0...HEAD
+[7.7.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.1...v7.7.0
 [7.6.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.0...v7.6.1
 [7.6.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.5.0...v7.6.0
 [7.5.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.4.1...v7.5.0
