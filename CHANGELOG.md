@@ -8,6 +8,15 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Added
+
+- **`MenuToggle`: öffentliche Methoden `open()` und `close()`.** Bisher liess sich das Menü nur über den einen Menü-Button öffnen. Ein Menü mit mehreren Knöpfen – etwa Hauptmenüpunkte, die je ihre Spalten aufklappen – konnte das Fixieren des Body, den Scrollbar-Ausgleich und das Zurückspringen an die alte Scroll-Position deshalb nicht mitbenutzen. Beide Methoden tun nichts, wenn das Menü schon im gewünschten Zustand ist, und melden sonst wie bisher `eventMenuestatus`.
+- **`MenuToggle`: Der Menü-Button sagt an, ob das Menü offen ist.** Er trägt `aria-expanded` und, wenn der Menü-Container eine ID hat, `aria-controls` – das Muster «Disclosure» der ARIA Authoring Practices. Bisher erfuhr Hilfstechnik nicht, dass der Button etwas öffnet. Verborgen wird das Menü weiter über das CSS an `data-menu-active`, nicht mit `hidden`: Sonst verschwände es beim Schliessen sofort, und Animationen wären nicht mehr möglich.
+
+### Fixed
+
+- **`MenuToggle`: Kein Sprung nach links, wenn die Scrollbar beim Öffnen stehen bleibt.** Der Ausgleich nahm immer die volle Scrollbar-Breite (`innerWidth - clientWidth`) an, als verschwände die Scrollbar mit dem Fixieren. Mit `overflow-y: scroll` oder `scrollbar-gutter: stable` an `html` bleibt sie aber stehen, und der zusätzliche `padding-right` schob den Inhalt um ihre Breite nach links. Jetzt misst `MenuToggle` `clientWidth` vor und nach dem Fixieren und gleicht nur die Differenz aus. Ohne diese Angaben ändert sich nichts.
+
 ## [7.6.1] – 2026-10-09
 
 ### Fixed

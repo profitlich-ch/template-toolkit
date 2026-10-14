@@ -80,6 +80,14 @@ export class MenuToggle {
             }
         });
 
+        // Der Button sagt Hilfstechnik an, ob das Menü offen ist (ARIA Authoring
+        // Practices, «Disclosure»). Verborgen wird das Menü weiter über das CSS an
+        // `data-menu-active`, nicht mit `hidden`, damit Projekte das Öffnen animieren können.
+        this.#menuButton.setAttribute('aria-expanded', 'false');
+        if (this.#menu.id) {
+            this.#menuButton.setAttribute('aria-controls', this.#menu.id);
+        }
+
         this.#setBodyAttribute('data-menu-active', 'false');
         this.#setBodyAttribute('data-menu-moving', 'false');
         this.#fixElement.setAttribute('data-menu-fixed', 'false');
@@ -102,65 +110,98 @@ export class MenuToggle {
         return MenuToggle.#instance;
     }
 
-    #toggleMenu() {
+    /**
+     * Öffnet das Menü – wie ein Klick auf den Menü-Button, aber von anderer Stelle,
+     * etwa wenn ein Projekt das Menü über eigene Knöpfe öffnet. Ist es schon offen,
+     * geschieht nichts.
+     */
+    open() {
         if (this.isActive) {
-            this.isActive = false;
-            document.body.removeEventListener('click', this.#bodyClickHandler);
-            window.removeEventListener('resize', this.#resizeHandler);
-            this.#setBodyAttribute('data-menu-active', 'false');
-            if (this.#lockScroll) {
-                this.#fixElement.setAttribute('data-menu-fixed', 'false');
-                if (this.#shiftElement) {
-                    this.#shiftElement.style.marginRight = '';
-                    this.#shiftElement.style.width = '';
-                }
-                if (this.#fixElementIsBody) {
-                    this.#fixElement.style.paddingRight = '';
-                }
-                this.#fixElement.style.top = '';
-                window.scrollTo(0, this.#y);
+            return;
+        }
+        this.isActive = true;
+        this.#menuButton.setAttribute('aria-expanded', 'true');
+        document.body.addEventListener('click', this.#bodyClickHandler);
+        this.#setBodyAttribute('data-menu-active', 'true');
+        if (this.#lockScroll) {
+            window.addEventListener('resize', this.#resizeHandler);
+            this.#setBodyAttribute('data-menu-moving', 'true');
+            if (!this.#deferPositionFixed) {
+                this.#applyFix();
             }
-            this.#toggleEscape(false);
-        } else {
-            this.isActive = true;
-            document.body.addEventListener('click', this.#bodyClickHandler);
-            this.#setBodyAttribute('data-menu-active', 'true');
-            if (this.#lockScroll) {
-                window.addEventListener('resize', this.#resizeHandler);
-                this.#setBodyAttribute('data-menu-moving', 'true');
-                if (!this.#deferPositionFixed) {
+            setTimeout(() => {
+                if (this.#deferPositionFixed) {
                     this.#applyFix();
                 }
-                setTimeout(() => {
-                    if (this.#deferPositionFixed) {
-                        this.#applyFix();
-                    }
-                    if (this.#shiftElement) {
-                        const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
-                        this.#shiftElement.style.marginRight = `${marginOriginal + this.#scrollbarWidth}px`;
-                        this.#adjustShiftElementWidth();
-                    }
-                    this.#setBodyAttribute('data-menu-moving', 'false');
-                }, this.#shiftDelay);
-            }
-            this.#toggleEscape(true);
+                if (this.#shiftElement) {
+                    const marginOriginal = parseFloat(window.getComputedStyle(this.#menuButton).marginRight);
+                    this.#shiftElement.style.marginRight = `${marginOriginal + this.#scrollbarWidth}px`;
+                    this.#adjustShiftElementWidth();
+                }
+                this.#setBodyAttribute('data-menu-moving', 'false');
+            }, this.#shiftDelay);
         }
+        this.#toggleEscape(true);
+        this.#dispatchStatus();
+    }
+
+    /**
+     * Schliesst das Menü und stellt die Scroll-Position wieder her. Ist es schon zu,
+     * geschieht nichts.
+     */
+    close() {
+        if (!this.isActive) {
+            return;
+        }
+        this.isActive = false;
+        this.#menuButton.setAttribute('aria-expanded', 'false');
+        document.body.removeEventListener('click', this.#bodyClickHandler);
+        window.removeEventListener('resize', this.#resizeHandler);
+        this.#setBodyAttribute('data-menu-active', 'false');
+        if (this.#lockScroll) {
+            this.#fixElement.setAttribute('data-menu-fixed', 'false');
+            if (this.#shiftElement) {
+                this.#shiftElement.style.marginRight = '';
+                this.#shiftElement.style.width = '';
+            }
+            if (this.#fixElementIsBody) {
+                this.#fixElement.style.paddingRight = '';
+            }
+            this.#fixElement.style.top = '';
+            window.scrollTo(0, this.#y);
+        }
+        this.#toggleEscape(false);
+        this.#dispatchStatus();
+    }
+
+    #toggleMenu() {
+        if (this.isActive) {
+            this.close();
+        } else {
+            this.open();
+        }
+    }
+
+    #dispatchStatus() {
         const event = new CustomEvent('eventMenuestatus', {
             detail: { menueStatus: this.isActive }
         });
         document.dispatchEvent(event);
     }
 
-    // Scrollbar-Ausgleich nur nötig, wenn der Body fixiert wird –
-    // bei anderem #fixElement bleibt die Seiten-Scrollbar bestehen.
+    // Ausgeglichen wird nur, was das Fixieren an Breite wirklich freigibt. Bleibt die
+    // Scrollbar stehen – `overflow-y: scroll` oder `scrollbar-gutter: stable` an `html`,
+    // oder ein anderes #fixElement als der Body –, ist das nichts; ein Ausgleich um die
+    // volle Scrollbar-Breite schöbe den Inhalt dann nach links.
     #applyFix() {
-        this.#scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        const widthBefore = document.documentElement.clientWidth;
         this.#y = window.scrollY;
+        this.#fixElement.style.top = `-${this.#y}px`;
+        this.#fixElement.setAttribute('data-menu-fixed', 'true');
+        this.#scrollbarWidth = Math.max(0, document.documentElement.clientWidth - widthBefore);
         if (this.#fixElementIsBody) {
             this.#fixElement.style.paddingRight = `${this.#scrollbarWidth}px`;
         }
-        this.#fixElement.style.top = `-${this.#y}px`;
-        this.#fixElement.setAttribute('data-menu-fixed', 'true');
         if (!this.#fixElementIsBody) {
             // Bei nicht-body-Fix-Element bleibt der window-Scroll erhalten; ohne Reset
             // erscheint ein absolut positioniertes Menü um den vorherigen Scroll-Betrag verschoben.
