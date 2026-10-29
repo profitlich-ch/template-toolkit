@@ -8,6 +8,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+
+- **`CLAUDE.project.md`: Keine Vendor-Präfixe von Hand.** LightningCSS ergänzt sie beim Build anhand von Vites Browser-Zielen, `-webkit-backdrop-filter` etwa für Safari 16.4. Ein von Hand gesetztes Präfix ist doppelt und bleibt stehen, wenn die Ziele es längst nicht mehr verlangen.
+
 ### Fixed
 
 - **`MenuToggle`: Ein fixiertes Element, das nicht oben im Dokument beginnt, springt nicht mehr.** Mit `fixElementSelector` lässt sich statt des Body etwa `main` fixieren; steht davor ein Header im Fluss, sprang `main` beim Öffnen um dessen Höhe nach oben, weil `top` aus `scrollY` berechnet wurde. Jetzt kommt `top` von `getBoundingClientRect()` des Elements. Für den Body ist das derselbe Wert wie bisher.
