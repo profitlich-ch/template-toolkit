@@ -11,6 +11,13 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 ### Changed
 
 - **`CLAUDE.project.md`: Keine Vendor-Präfixe von Hand.** LightningCSS ergänzt sie beim Build anhand von Vites Browser-Zielen, `-webkit-backdrop-filter` etwa für Safari 16.4. Ein von Hand gesetztes Präfix ist doppelt und bleibt stehen, wenn die Ziele es längst nicht mehr verlangen.
+- **`CLAUDE.craftcms.md`: Kein Sammel-Import der Modul-SCSS.** Das CSS eines Moduls kommt allein über dessen JS, craft-vite gibt es beim `register` mit aus. Der Sammel-Import in `app.scss` baute jede Regel zweimal und lud auf jeder Seite alle Module; in `appert-zwahlen.ch` fiel `app.css` ohne ihn von 95 auf 5,5 kB. Dazu der Hinweis, dass ein fehlender Entry erst in Produktion auffällt, weil der Dev-Server jede Datei ausliefert. Für Kirby gilt die Regel nicht: `vite()->js()` gibt kein CSS aus, das Snippet-CSS kommt dort allein über die Sammeldatei.
+- **`CLAUDE.craftcms.md`: `App.js` im `<head>` registrieren, vor jedem Modul.** Die Reihenfolge der `craft.vite.register`-Aufrufe ist die der `<link>`-Tags. Steht `App.js` am Ende des Layouts, kommt das CSS eines Layout-Moduls wie des Menüs vor `app.css`, und ohne Sammel-Import gewinnen die Basis-Regeln bei gleicher Spezifität. Projekte mit Sammel-Import stellen in einem Schritt um:
+  1. `@use "../modules/modules"` aus `app.scss` entfernen, die Sammeldatei mit `git rm` löschen.
+  2. Jedes Modul ohne eigenes JS bekommt eines, das sein SCSS importiert, registriert mit `craft.vite.register` im Template, das das Markup rendert, und mit einem Entry in `rollupOptions.input`. Steht das Markup im Layout, registriert das Layout das JS – auch wenn es sonst nur von anderen Modulen importiert wird.
+  3. `{% do craft.vite.register("src/App.js", false) %}` vor `</head>` verschieben; `Dev.js` bleibt am Ende des `<body>`.
+  4. Vorher und nachher die berechneten Styles (mit `::before`/`::after`) und Boxen aller Elemente vergleichen – auf dem gebauten Stand, nicht gegen den Dev-Server, über mehrere Seiten, Breiten und Zustände wie ein offenes Menü. Eine Gegenprobe zeigt, dass der Vergleich anschlägt: eine Regel mit dem Selektor eines Moduls vorübergehend in `app.scss`.
+- **`CLAUDE.project.md`: `@mux/mux-player` installiert das Projekt selbst.** Die Bibliothek ist eine optionale Peer-Dependency; ein Projekt mit Videos installiert sie mit `ddev npm install -D @mux/mux-player`. Die Vorlage bringt sie nicht mehr mit.
 
 ### Fixed
 

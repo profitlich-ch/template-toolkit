@@ -198,7 +198,7 @@ Den Body **nie** bis `DOMContentLoaded` per `visibility: hidden` verstecken, auc
 
 Was bleibt: `body[data-preloading="true"]` gegen Transitions beim Laden und das Firefox-`<script>0</script>`.
 
-Grosse Bibliotheken, die nur ein Teil der Seiten braucht, per dynamischem `import()` laden, nicht statisch – wie `MuxPlayer` mit `@mux/mux-player`.
+Grosse Bibliotheken, die nur ein Teil der Seiten braucht, per dynamischem `import()` laden, nicht statisch – wie `MuxPlayer` mit `@mux/mux-player`. Die Bibliothek ist eine optionale Peer-Dependency: Ein Projekt mit Videos installiert sie selbst (`ddev npm install -D @mux/mux-player`), die Vorlage bringt sie nicht mit.
 
 ### Performance messen
 
