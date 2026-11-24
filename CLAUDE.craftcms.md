@@ -16,6 +16,12 @@ Fehlt der Entry in `rollupOptions.input`, fehlt in Produktion das CSS des Moduls
 
 *Anlass:* Mit dem Sammel-Import der Modul-SCSS fiel das nicht auf, weil `app.css` die Modulregeln ein zweites Mal enthielt; ohne ihn kehrte sich die Kaskade um (`template-craftcms` #363, 2026-11-04).
 
+**Schriften und CSS-Grafiken relativ zur SCSS-Datei einbinden, nicht über einen Pfad unter `web/`.** Schriften liegen in `src/fonts/` und werden aus `src/scss/project/fonts.scss` als `url("../../fonts/name.woff2")` eingebunden. Eine Grafik, die nur das CSS braucht (`content`, `mask-image`, `background-image`), liegt neben dem Modul und wird mit `url('./modul__icon.svg')` eingebunden. Vite legt solche Dateien mit Hash im Namen nach `web/dist/assets/`, und die `.htaccess` lässt sie dort ein Jahr lang `immutable` cachen. Dateien bis 4 KB bettet Vite direkt ins CSS ein. Einen absoluten Pfad wie `/fonts/…` sucht Vite nur im `publicDir`: Die Datei bleibt ohne Hash, und der Build meldet `didn't resolve at build time`. Erscheint diese Meldung trotz relativem Pfad, fehlt die Datei. `scripts/copy-files.js` hat darum keinen Kopierschritt für Schriften. Nach `web/` wird nur kopiert, was das Twig per `<img>` einbindet.
+
+Ausgenommen sind Stylesheets ausserhalb von Vite, etwa das eines CKEditor-Asset-Bundles fürs CP: Sie brauchen weiterhin einen festen Pfad unter `web/`.
+
+*Anlass:* In `appert-zwahlen.ch` am 4.11.2026 umgestellt; zuvor erbte jedes Projekt die Build-Warnung und lieferte die Schriften ungehasht aus (`template-craftcms` #364).
+
 Die Sicherheits-Header (HSTS, `X-Content-Type-Options`, `X-Frame-Options`) setzt die `.htaccess` mit `Header always set`, nicht ein Plugin: Seiten, die Blitz statisch ausliefert, erreichen PHP nie. Prüfen per `GET` (`curl -s -D - -o /dev/null <url>`), nicht mit `curl -I` – ein `HEAD` läuft an Blitz vorbei durch PHP.
 
 **Project Config:** Feld- und Struktur-Änderungen können direkt in den YAML-Dateien unter `config/project/` gemacht werden, danach `ddev craft project-config/apply` (Kontrolle vorher mit `project-config/diff`). `allowAdminChanges` ist üblicherweise nur in der Dev-Umgebung aktiv, Änderungen über die Oberfläche gehen also ausschliesslich lokal.

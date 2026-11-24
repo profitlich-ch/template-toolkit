@@ -8,6 +8,13 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+### Changed
+
+- **`CLAUDE.craftcms.md`: Schriften und CSS-Grafiken relativ zur SCSS-Datei einbinden.** `url("../../fonts/name.woff2")` statt `url("/fonts/name.woff2")`. Vite löst absolute Pfade nur im `publicDir` auf und warnte deshalb bei jedem Build. Ausserdem kam die Schrift ohne Hash aus und liess sich nicht dauerhaft cachen. Mit relativem Pfad legt Vite sie gehasht nach `web/dist/assets/`. Projekte stellen so um:
+  1. In `src/scss/project/fonts.scss` jede `url("/fonts/…")` durch `url("../../fonts/…")` ersetzen.
+  2. Den Kopierschritt `fonts` aus `scripts/copy-files.js` entfernen und `web/fonts/` löschen.
+  3. `ddev npm run build`: Die Meldung `didn't resolve at build time` verschwindet, und die Schriften erscheinen als `web/dist/assets/<name>-<hash>.woff2`.
+
 ## [7.8.0] – 2026-11-04
 
 ### Changed
