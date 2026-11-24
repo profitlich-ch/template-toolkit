@@ -1,6 +1,6 @@
 # 0001 — Gestaltungswerte als Design Tokens in einer Resolver-Datei
 
-**Status:** angenommen, 2026-11-03
+**Status:** angenommen, 2026-11-03; verworfen, 2026-11-24 – der Nutzen hängt am Austausch mit Figma, und Figma liest keinen Resolver und exportiert `typography` nicht (#4)
 
 ## Kontext
 
