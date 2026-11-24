@@ -41,8 +41,12 @@
         "scss/",
         "scripts/",
         "utils/",
-        "vite/"
+        "vite/",
+        "!**/*.test.js"
     ],
+    "scripts": {
+        "test": "node --test"
+    },
     "dependencies": {
         "basic-ftp": "^6.2.2",
         "canvas-grid-lines": "^10.6.0",

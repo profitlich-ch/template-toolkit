@@ -15,6 +15,10 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
   2. Den Kopierschritt `fonts` aus `scripts/copy-files.js` entfernen und `web/fonts/` löschen.
   3. `ddev npm run build`: Die Meldung `didn't resolve at build time` verschwindet, und die Schriften erscheinen als `web/dist/assets/<name>-<hash>.woff2`.
 
+### Fixed
+
+- **`jsonToScss`: Benannte Farben und Farbfunktionen unter `colors` landen gültig im CSS.** Bisher kamen nur Hex-Werte ohne Anführungszeichen ins SCSS; `"background": "white"` wurde zum Sass-String, im CSS stand `background-color:"white"`, und der Browser verwarf die Deklaration ohne Meldung. Jetzt gilt unter `colors` jede CSS-Farbschreibweise – `white`, `transparent`, `rgb()`, `oklch()`. Ausserhalb von `colors` bleiben Strings in Anführungszeichen und Hex-Werte ohne, wie bisher. Projekte brauchen keine Änderung.
+
 ## [7.8.0] – 2026-11-04
 
 ### Changed
