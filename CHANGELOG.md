@@ -8,6 +8,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ## [Unreleased]
 
+## [7.9.0] – 2026-11-25
+
 ### Changed
 
 - **`CLAUDE.craftcms.md`: Schriften und CSS-Grafiken relativ zur SCSS-Datei einbinden.** `url("../../fonts/name.woff2")` statt `url("/fonts/name.woff2")`. Vite löst absolute Pfade nur im `publicDir` auf und warnte deshalb bei jedem Build. Ausserdem kam die Schrift ohne Hash aus und liess sich nicht dauerhaft cachen. Mit relativem Pfad legt Vite sie gehasht nach `web/dist/assets/`. Projekte stellen so um:
@@ -398,7 +400,8 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
   Der DOM-Marker `data-menu-fixed` wandert vom Body auf das via `fixElementSelector` gewählte Element. CSS, das `body[data-menu-fixed="true"]` selektiert, muss auf den neuen Selektor angepasst werden (z. B. `#seite[data-menu-fixed="true"]`), wenn ein eigenes Fix-Element verwendet wird. Bei Default (Body) bleibt das Verhalten gleich.
 
-[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.8.0...HEAD
+[Unreleased]: https://github.com/profitlich-ch/template-toolkit/compare/v7.9.0...HEAD
+[7.9.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.8.0...v7.9.0
 [7.8.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.7.0...v7.8.0
 [7.7.0]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.1...v7.7.0
 [7.6.1]: https://github.com/profitlich-ch/template-toolkit/compare/v7.6.0...v7.6.1
