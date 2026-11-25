@@ -3,6 +3,7 @@ import { glob } from 'glob';
 import path from 'path';
 import chokidar from 'chokidar';
 import { syncConventions } from './sync-conventions.js';
+import { coalesce } from './coalesce.js';
 
 /**
  * @typedef {Object} CopyTask
@@ -12,65 +13,101 @@ import { syncConventions } from './sync-conventions.js';
  * @property {string} base - Basis-Pfad; relative Pfade werden ausgehend davon erhalten.
  */
 
-async function runTask(task) {
-    const files = await glob(task.src, { nodir: true, dot: true });
-    if (files.length === 0) return;
+/** Liefert je Quelldatei des Tasks das absolute Paar aus Quelle und Ziel. */
+async function taskFiles(task) {
+    const patterns = [task.src].flat();
+    // glob ab Version 9 kennt keine Negation im Muster; ein `!…` schlösse sonst nichts aus.
+    const include = patterns.filter(p => !p.startsWith('!'));
+    const ignore = patterns.filter(p => p.startsWith('!')).map(p => p.slice(1));
+    const files = await glob(include, { nodir: true, dot: true, ignore });
+    return files.map(file => ({
+        src: path.resolve(file),
+        dest: path.resolve(task.dest, path.relative(task.base, file)),
+    }));
+}
 
-    for (const file of files) {
-        const relativePath = path.relative(task.base, file);
-        const destPath = path.join(task.dest, relativePath);
-        await fs.copy(file, destPath);
+async function isCurrent(src, dest) {
+    try {
+        const [s, d] = await Promise.all([fs.stat(src), fs.stat(dest)]);
+        return s.size === d.size && s.mtimeMs <= d.mtimeMs;
+    } catch {
+        return false;
+    }
+}
+
+async function copyFile(src, dest) {
+    if (await isCurrent(src, dest)) return;
+    // Über eine Zwischendatei, damit eine gleichzeitige Anfrage nie eine halb geschriebene Datei liest.
+    const tmp = path.join(path.dirname(dest), `.${path.basename(dest)}.${process.pid}.tmp`);
+    try {
+        await fs.copy(src, tmp);
+    } catch (err) {
+        // Seit glob gelöscht: Das Ereignis dazu hat den nächsten Durchgang schon vorgemerkt.
+        if (err.code === 'ENOENT' && !(await fs.pathExists(src))) return;
+        throw err;
+    }
+    await fs.rename(tmp, dest);
+}
+
+/** Entfernt unter `dir` jede Datei ausserhalb von `keep` und leere Ordner ausser den Zielen selbst. */
+async function prune(dir, keep, roots) {
+    let entries;
+    try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+        return;
+    }
+    for (const entry of entries) {
+        const p = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            await prune(p, keep, roots);
+            if (!roots.has(p) && (await fs.readdir(p)).length === 0) await fs.rmdir(p);
+        } else if (!keep.has(p)) {
+            await fs.remove(p);
+        }
     }
 }
 
 /**
- * Leert alle Ziel-Verzeichnisse und kopiert anschliessend alle Quelldateien
- * jedes Tasks parallel ins jeweilige Ziel.
+ * Bringt alle Ziel-Verzeichnisse auf den Stand der Quellen: kopiert neue und
+ * geänderte Dateien und entfernt danach, was keine Quelle mehr hat. Die Ziele
+ * werden nie geleert; zu keinem Zeitpunkt fehlt eine Datei, die eine Quelle hat.
+ *
+ * Verwaist ist eine Datei erst, wenn sie zu keinem Task gehört. So bleiben
+ * ineinanderliegende Ziele (`templates` und `templates/_macros`) und Ziele,
+ * die mehrere Tasks gemeinsam füllen, erhalten.
  * @param {CopyTask[]} copyTasks
  */
 export async function copyAll(copyTasks) {
-    console.log('🚀 Starting initial copy of all files...');
-    // empty folders to prevent orphaned files
+    const pairs = new Map();
     for (const task of copyTasks) {
-        await fs.emptyDir(task.dest);
+        for (const { src, dest } of await taskFiles(task)) pairs.set(dest, src);
     }
-    // run tasks parallely
-    await Promise.all(copyTasks.map(task => runTask(task)));
-    console.log('✅ Initial copy complete.');
+    const roots = new Set(copyTasks.map(task => path.resolve(task.dest)));
+    for (const root of roots) await fs.ensureDir(root);
+
+    await Promise.all([...pairs].map(([dest, src]) => copyFile(src, dest)));
+    for (const root of roots) await prune(root, pairs, roots);
+    console.log(`✅ ${pairs.size} files in sync.`);
 }
 
 /**
- * Beobachtet `watchDir` und führt bei jeder Änderung `copyAll` aus.
+ * Beobachtet `watchDir` und führt nach Änderungen `copyAll` aus. Änderungen
+ * kurz nacheinander ergeben einen Durchgang; was während eines Durchgangs
+ * geändert wird, holt ein weiterer Durchgang direkt danach nach.
  * @param {CopyTask[]} copyTasks
  * @param {string} [watchDir='src']
  */
 export function watchFiles(copyTasks, watchDir = 'src') {
     console.log(`👀 Watching for file changes in ${watchDir}/`);
 
-    // set lock variable to prevent parallel copy tasks
-    let isCopying = false;
+    const trigger = coalesce(() => copyAll(copyTasks));
+    const watcher = chokidar.watch(watchDir, { ignored: /(^|[\/\\])\../, persistent: true, ignoreInitial: true });
 
-    const watcher = chokidar.watch(watchDir, { ignored: /(^|[\/\\])\../, persistent: true });
-
-    watcher.on('all', async (event, filePath) => {
-        if (['add', 'change', 'unlink'].includes(event)) {
-
-            // only proceed if copy job is not running
-            if (isCopying) {
-                return;
-            }
-
-            console.log(`[${event}] ${filePath}. Re-copying all files...`);
-
-            // secure copy job with try...finally
-            try {
-                isCopying = true; // activate lock
-                await copyAll(copyTasks);
-            } catch (err) {
-                console.error("Error during copy:", err);
-            } finally {
-                isCopying = false; // deactivate lock, allow new copy job
-            }
+    watcher.on('all', (event, filePath) => {
+        if (['add', 'change', 'unlink', 'unlinkDir'].includes(event)) {
+            console.log(`[${event}] ${filePath}`);
+            trigger();
         }
     });
 }

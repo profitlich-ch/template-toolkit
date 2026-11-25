@@ -17,6 +17,9 @@ Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionier
 
 ### Fixed
 
+- **`copy-files`: Änderungen während eines Durchgangs gehen im Dev-Modus nicht mehr verloren.** Ein Ereignis während eines laufenden Durchgangs wurde verworfen. Was nach dem Einlesen der Dateiliste geändert, angelegt oder gelöscht wurde, fehlte im Ziel bis zur nächsten Änderung, etwa beim Speichern mehrerer Dateien, bei `git switch` oder bei einem Formatierer. Jetzt wird es vorgemerkt, und direkt danach läuft ein weiterer Durchgang. Änderungen innerhalb von 100 ms ergeben einen gemeinsamen Durchgang.
+- **`copy-files`: Die Ziele sind nie mehr leer.** `copyAll` leerte vor jedem Durchgang alle Ziele; eine Anfrage in diesem Fenster fand ihr Template nicht. Jetzt kopiert es neue und geänderte Dateien und entfernt danach, was keine Quelle mehr hat, beim Start, im Dev-Modus und beim Build. Unveränderte Dateien bleiben unangetastet, geänderte werden über eine Zwischendatei ersetzt. Dadurch lädt `deploy` nach einem Build nur noch hoch, was sich geändert hat, statt alle kopierten Dateien.
+- **`copy-files`: Ausschlussmuster mit `!` wirken.** glob ab Version 9 kennt keine Negation im Muster; `'!src/snippets/**/_*.*'` schloss nichts aus. Solche Muster gehen jetzt als `ignore` an glob. In den bestehenden Projekten trifft keines davon eine Datei, die sonst kopiert würde.
 - **`jsonToScss`: Benannte Farben und Farbfunktionen unter `colors` landen gültig im CSS.** Bisher kamen nur Hex-Werte ohne Anführungszeichen ins SCSS; `"background": "white"` wurde zum Sass-String, im CSS stand `background-color:"white"`, und der Browser verwarf die Deklaration ohne Meldung. Jetzt gilt unter `colors` jede CSS-Farbschreibweise – `white`, `transparent`, `rgb()`, `oklch()`. Ausserhalb von `colors` bleiben Strings in Anführungszeichen und Hex-Werte ohne, wie bisher. Projekte brauchen keine Änderung.
 
 ## [7.8.0] – 2026-11-04

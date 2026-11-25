@@ -59,3 +59,5 @@ Eine neue Regel gehört hierher, wenn sie den Stack betrifft, in die Sorten-Date
 ## Am Toolkit arbeiten
 
 Der Release-Ablauf und die Besonderheiten dieses Repos stehen in `CLAUDE.md`. Kurz: Änderung mit Changelog-Eintrag unter `[Unreleased]`, dann ein Versions-Commit mit Tag, dann `npm publish`, dann die Projekte heben.
+
+Tests liegen als `*.test.js` neben dem Code und laufen mit `npm test` über den Test-Runner von Node. Ins Paket kommen sie nicht.
